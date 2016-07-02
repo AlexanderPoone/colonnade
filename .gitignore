@@ -1,0 +1,6 @@
+test-results/
+tmp/
+routes/
+
+*.DS_Store
+
