@@ -6,6 +6,8 @@ type App struct {
 	*revel.Controller
 }
 
+type Session map[string]string
+
 func (c App) Index() revel.Result {
 	return c.Render()
 }
