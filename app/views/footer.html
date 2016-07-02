@@ -1,3 +1,11 @@
+  <script src="/public/js/jquery-2.2.4.min.js"></script>
+  <script src="/public/js/bootstrap-3.3.6.min.js"></script>
+  <script src="/public/js/angular.min.js"></script>
+  <script src="/public/js/angular-route.min.js"></script>
+  <script src="/public/js/angular-cookies.min.js"></script>
+  {{range .moreScripts}}
+    <script src="/public/{{.}}" type="text/javascript" charset="utf-8"></script>
+  {{end}}
   {{if eq .RunMode "dev"}}
     {{template "debug.html" .}}
   {{end}}
