@@ -4,7 +4,7 @@ import (
     "github.com/revel/revel"
     "encoding/json"
     "io/ioutil"
-    //"github.com/ip4368/go-password"
+    "github.com/ip4368/go-password"
     "github.com/ip4368/go-userprofile"
 )
 
@@ -27,7 +27,7 @@ func (c *Users) Register() revel.Result {
 	}
 	json.Unmarshal([]byte(bodyBytes), &r)
 
-	//password.ValidatePassword(r.Password)
+	password.ValidatePassword(r.Password)
 	userprofile.ValidateEmail(r.Email)
 	userprofile.ValidateUsername(r.Username)
 	return c.Render()
