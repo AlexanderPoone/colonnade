@@ -47,6 +47,8 @@ func (c Users) Register() revel.Result {
             data["message"] = "Invalid Username"
         case 3 :
             data["message"] = "Invalid Password"
+        case 4 :
+            data["message"] = "Username/Password has been used"
     }
     return c.RenderJson(data)
 }

@@ -8,6 +8,14 @@ import (
     "github.com/ip4368/go-password"
 )
 
+type Users_t struct {
+    Identifier [2]string
+    Passwd string
+    Salt string
+    PrevPasswd []string
+    Suspended bool
+}
+
 func GuardUsers() {
     localDBSession, err := mgo.Dial("mongodb://localhost/colonnade")
     if err != nil {
@@ -33,8 +41,23 @@ func RegisterHandler(s *mgo.Session, email, username, passwd string) int {
     if !userprofile.ValidateEmail(email) { return 1 }
     if !userprofile.ValidateUsername(username) { return 2 }
     if !password.ValidatePassword(passwd) { return 3 }
+
+    hashed, salt, _ := password.HashAutoSalt(passwd)
+    doc := Users_t{
+        [2]string{email, username},
+        hashed,
+        salt,
+        []string{},
+        false,
+    }
+
+    // get collection from mgo session
+    users := s.DB("colonnade").C("users")
+    err := users.Insert(doc)
+
+    if err != nil { return 4 }
     return 0
-    //hashed, salt, _ := password.HashAutoSalt(r.Password)
+    //
 }
 
 func LoginHandler(s *mgo.Session, email, passwd string) int {
