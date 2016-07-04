@@ -13,10 +13,6 @@ func init() {
     revmgo.ControllerInit()
 }
 
-/*type Users struct {
-    *revel.Controller
-}*/
-
 type Users struct {
     *revel.Controller
     revmgo.MongoController
