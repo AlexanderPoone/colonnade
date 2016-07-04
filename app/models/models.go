@@ -4,6 +4,8 @@ import (
     "gopkg.in/mgo.v2"
     //"gopkg.in/mgo.v2/bson"
     "github.com/revel/revel"
+    "github.com/ip4368/go-userprofile"
+    "github.com/ip4368/go-password"
 )
 
 func GuardUsers() {
@@ -24,4 +26,21 @@ func GuardUsers() {
         users.EnsureIndex(index)
         localDBSession.Close()
     }
+}
+
+func RegisterHandler(s *mgo.Session, email, username, passwd string) int {
+    // validate all email, username and password
+    if !userprofile.ValidateEmail(email) { return 1 }
+    if !userprofile.ValidateUsername(username) { return 2 }
+    if !password.ValidatePassword(passwd) { return 3 }
+    return 0
+    //hashed, salt, _ := password.HashAutoSalt(r.Password)
+}
+
+func LoginHandler(s *mgo.Session, email, passwd string) int {
+    // validate password and check against database
+    userprofile.ValidateEmail(email)
+    password.ValidatePassword(passwd)
+
+    return 0
 }

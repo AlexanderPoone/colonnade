@@ -4,8 +4,6 @@ import (
     "github.com/revel/revel"
     "encoding/json"
     "io/ioutil"
-    "github.com/ip4368/go-password"
-    "github.com/ip4368/go-userprofile"
     "github.com/janekolszak/revmgo"
     "github.com/ip4368/colonnade/app/models"
 )
@@ -27,11 +25,6 @@ type RegisterProfile struct {
 }
 
 func (c Users) Register() revel.Result {
-    // start with initialise response interface
-    data := make(map[string]interface{})
-    data["error"] = nil
-    data["message"] = "Successfully Registered"
-
     // read request body to byte
     var r RegisterProfile
     var bodyBytes []byte
@@ -40,33 +33,25 @@ func (c Users) Register() revel.Result {
     }
     json.Unmarshal([]byte(bodyBytes), &r)
 
-    // validate all email, username and password
-    if !userprofile.ValidateEmail(r.Email) {
-        data["error"] = 1
-        data["message"] = "Invalid Email"
-        return c.RenderJson(data)
+    result := models.RegisterHandler(c.MongoSession, r.Email, r.Username, r.Password)
+
+    // start with initialise response interface
+    data := make(map[string]interface{})
+    data["error"] = result
+    switch result {
+        case 0 :
+            data["message"] = "Successfully Registered"
+        case 1 :
+            data["message"] = "Invalid Email"
+        case 2 :
+            data["message"] = "Invalid Username"
+        case 3 :
+            data["message"] = "Invalid Password"
     }
-    if !userprofile.ValidateUsername(r.Username) {
-        data["error"] = 2
-        data["message"] = "Invalid Username"
-        return c.RenderJson(data)
-    }
-    if !password.ValidatePassword(r.Password) {
-        data["error"] = 3
-        data["message"] = "Invalid Password"
-        return c.RenderJson(data)
-    }
-    
-    //hashed, salt, _ := password.HashAutoSalt(r.Password)
     return c.RenderJson(data)
 }
 
 func (c Users) Login() revel.Result {
-    // start with initialise response interface
-    data := make(map[string]interface{})
-    data["error"] = nil
-    data["message"] = "Successfully Logged In"
-
     // read request body to byte
     var r RegisterProfile
     var bodyBytes []byte
@@ -75,6 +60,16 @@ func (c Users) Login() revel.Result {
     }
     json.Unmarshal([]byte(bodyBytes), &r)
 
-    userprofile.ValidateEmail(r.Email)
+    result := models.LoginHandler(c.MongoSession, r.Email, r.Password)
+
+    // start with initialise response interface
+    data := make(map[string]interface{})
+    data["error"] = result
+    switch result {
+        case 0 :
+            data["message"] = "Successfully Logged In"
+        case 1 :
+            data["message"] = "Invalid Log in"
+    }
     return c.RenderJson(data)
 }
