@@ -13,8 +13,13 @@ func init() {
     revmgo.ControllerInit()
 }
 
+/*type Users struct {
+    *revel.Controller
+}*/
+
 type Users struct {
     *revel.Controller
+    revmgo.MongoController
 }
 
 type RegisterProfile struct {
@@ -23,7 +28,7 @@ type RegisterProfile struct {
     Email string `json:"email"`
 }
 
-func (c *Users) Register() revel.Result {
+func (c Users) Register() revel.Result {
 	// start with initialise response interface
 	data := make(map[string]interface{})
 	data["error"] = nil
@@ -58,7 +63,7 @@ func (c *Users) Register() revel.Result {
 	return c.RenderJson(data)
 }
 
-func (c *Users) Login() revel.Result {
+func (c Users) Login() revel.Result {
 	// start with initialise response interface
 	data := make(map[string]interface{})
 	data["error"] = nil
