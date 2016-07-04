@@ -6,7 +6,12 @@ import (
     "io/ioutil"
     "github.com/ip4368/go-password"
     "github.com/ip4368/go-userprofile"
+    "github.com/janekolszak/revmgo"
 )
+
+func init() {
+    revmgo.ControllerInit()
+}
 
 type Users struct {
     *revel.Controller
@@ -32,6 +37,7 @@ func (c *Users) Register() revel.Result {
 	}
 	json.Unmarshal([]byte(bodyBytes), &r)
 
+	// validate all email, username and password
 	if !userprofile.ValidateEmail(r.Email) {
 		data["error"] = 1
 		data["message"] = "Invalid Email"
