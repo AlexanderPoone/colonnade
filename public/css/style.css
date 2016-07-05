@@ -1,0 +1,102 @@
+html, body {
+    height: 100% !important;
+}
+
+#main-padding {
+    height: 42px;
+    width: 100%;
+}
+
+#main-menu-small {
+    display: none;
+    width: 100% !important;
+    height: 42px;
+    position: fixed;
+    top: 0 !important;
+    left: 0 !important;
+    margin: 0 !important;
+}
+
+#side-menu {
+    display: none;
+    position: fixed;
+    top: 42px;
+    z-index: 101;
+    transform: translateX(-100%);
+    height: calc(100% - 42px);
+    background-color: #fff;
+    width: 150px;
+    -webkit-transition: transform 0.2s; /* Safari */
+    transition: transform 0.2s;
+}
+
+#side-menu ul {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    border-right-color: rgba(34, 36, 38, 0.14902);
+    border-right-style: solid;
+    border-right-width: 1px;
+}
+
+#side-menu li {
+    padding: 0 10px;
+    list-style-type: none;
+    height: 42px;
+    line-height: 42px;
+    color: rgba(0,0,0,.87);
+    border-bottom-color: rgba(34, 36, 38, 0.14902);
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+}
+#side-menu li:hover {
+    background-color: rgba(0, 0, 0, 0.027451);
+}
+
+.coverimage {
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(/images/home.jpg) !important;
+    background-size:     cover !important;
+    background-repeat:   no-repeat !important;
+    background-position: center center !important;
+    background-attachment: fixed !important;
+}
+
+.fullheight {
+    height: calc(100% - 42px) !important;
+}
+
+.colonnade-sidebar {
+    padding-top: 42px !important;
+}
+
+@media only screen and (min-width: 768px) {
+    .login-wrapper {
+        height: 100% !important;
+        margin: 0 !important;
+    }
+
+    .login-center {
+        top: 50%;
+        transform: translateY(-50%);
+        position: relative !important;
+        height: 300px;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    #main-menu {
+        display: none;
+    }
+
+    #main-menu-small {
+        display: flex;
+    }
+
+    #side-menu {
+        display: flex;
+    }
+
+    .login-center {
+        margin: 20px 0;
+    }
+}

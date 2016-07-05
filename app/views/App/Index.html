@@ -1,7 +1,7 @@
 {{set . "title" "Home"}}
 {{template "header.html" .}}
 
-<header class="jumbotron" style="background-color:#A9F16C">
+<!--<header class="jumbotron" style="background-color:#A9F16C">
   <div class="container">
     <div class="row">
       <h1>It works!</h1>
@@ -16,6 +16,46 @@
       {{template "flash.html" .}}
     </div>
   </div>
-</div>
+</div>-->
+
+<header class="ui stackable container menu fixed top" id="main-menu">
+  <a class="header item" href="./#/">Colonnade</a>
+  <a class="item" href="./#/dashboard/">Dashboard</a>
+  <div class="right menu">
+    <a class="ui item" href="./#/login/" ng-show="!login">
+      Login
+    </a>
+    <a class="ui item" href="./#/login/" ng-hide="!login">
+      Logout
+    </a>
+  </div>
+</header>
+<header class="ui container menu fixed top" id="main-menu-small">
+  <a class="item" id="menu-button"><i class="sidebar icon"></i></a>
+  <a class="header item small-menu-header" href="./#/">Colonnade</a>
+</header>
+<!--<div id="side-menu">
+  <ul>
+    <a href="./#/dashboard/" class="side-menu-button"><li>Dashboard</li></a>
+    <a href="./#/login/" class="side-menu-button" ng-show="!login"><li>Login</li></a>
+    <a href="./#/login/" class="side-menu-button" ng-hide="!login"><li>Logout</li></a>
+  </ul>
+</div>-->
+<body>
+  <div class="ui sidebar inverted vertical menu colonnade-sidebar">
+    <a class="item side-menu-button" href="./#/dashboard/">
+      Dashboard
+    </a>
+    <a class="item side-menu-button" href="./#/login/" ng-show="!login">
+      Login
+    </a>
+    <a class="item side-menu-button" href="./#/login/" ng-hide="!login">
+      Logout
+    </a>
+  </div>
+  
+</body>
+<div id="main-padding"></div>
+<div class="pusher fullheight" ng-view></div>
 
 {{template "footer.html" .}}

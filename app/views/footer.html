@@ -4,9 +4,7 @@
   <script src="/public/js/angular.min.js"></script>
   <script src="/public/js/angular-route.min.js"></script>
   <script src="/public/js/angular-cookies.min.js"></script>
-  {{range .moreScripts}}
-    <script src="/public/{{.}}" type="text/javascript" charset="utf-8"></script>
-  {{end}}
+  <script src="/public/js/script.js" type="text/javascript" charset="utf-8"></script>
   {{if eq .RunMode "dev"}}
     {{template "debug.html" .}}
   {{end}}
