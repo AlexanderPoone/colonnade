@@ -15,6 +15,7 @@ type Users_t struct {
     Salt string `bson:"salt"`
     PrevPasswd []string `bson:"prevpasswd"`
     Suspended bool `bson:"suspended"`
+    Name string `bson: name`
     Id    bson.ObjectId `bson:"_id,omitempty"`
 }
 
@@ -42,11 +43,12 @@ func userCollection(s *mgo.Session) *mgo.Collection {
     return s.DB("colonnade").C("users")
 }
 
-func RegisterHandler(s *mgo.Session, email, username, passwd string) int {
+func RegisterHandler(s *mgo.Session, email, username, passwd, name string) int {
     // validate all email, username and password
     if !userprofile.ValidateEmail(email) { return 1 }
     if !userprofile.ValidateUsername(username) { return 2 }
     if !password.ValidatePassword(passwd) { return 3 }
+    if !userprofile.ValidateName(name) { return 4 }
 
     hashed, salt, _ := password.HashAutoSalt(passwd)
     doc := Users_t{
@@ -55,6 +57,7 @@ func RegisterHandler(s *mgo.Session, email, username, passwd string) int {
         Salt: salt,
         PrevPasswd: []string{},
         Suspended: false,
+        Name: name,
     }
 
     err := userCollection(s).Insert(doc)

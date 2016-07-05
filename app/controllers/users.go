@@ -22,6 +22,7 @@ type RegisterProfile struct {
     Username string `json:"username"`
     Password string `json:"password"`
     Email string `json:"email"`
+    Name string `json:"name"`
 }
 
 func (c Users) Register() revel.Result {
@@ -33,7 +34,7 @@ func (c Users) Register() revel.Result {
     }
     json.Unmarshal([]byte(bodyBytes), &r)
 
-    result := models.RegisterHandler(c.MongoSession, r.Email, r.Username, r.Password)
+    result := models.RegisterHandler(c.MongoSession, r.Email, r.Username, r.Password, r.Name)
 
     // start with initialise response interface
     data := make(map[string]interface{})
@@ -48,6 +49,8 @@ func (c Users) Register() revel.Result {
         case 3 :
             data["message"] = "Invalid Password"
         case 4 :
+            data["message"] = "Invalid Name"
+        case 5 :
             data["message"] = "Username/Password has been used"
     }
     return c.RenderJson(data)
