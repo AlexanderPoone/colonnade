@@ -36,7 +36,7 @@ app
 	$scope.login = function() {
 		login($scope.loginInfo.email, $scope.loginInfo.password, function(data){
 			if(data.error == 0){
-				$location.url("/");
+				$location.url("/dashboard/");
 				$scope.loginErrMsg = "";
 			}else{
 				$scope.loginErrMsg = data.message;
