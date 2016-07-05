@@ -6,16 +6,16 @@
         <div class="field">
           <div class="ui left icon input">
             <i class="mail icon"></i>
-            <input type="text" name="email" placeholder="E-mail address">
+            <input type="text" name="email" placeholder="E-mail address" ng-model="loginInfo.email">
           </div>
         </div>
         <div class="field">
           <div class="ui left icon input">
             <i class="lock icon"></i>
-            <input type="password" name="password" placeholder="Password">
+            <input type="password" name="password" placeholder="Password"  ng-model="loginInfo.password">
           </div>
         </div>
-        <button class="ui blue button" type="submit">Login</button>
+        <button class="ui blue button" type="submit" ng-click="login()">Login</button>
       </form>
     </div>
   </div>
@@ -26,28 +26,28 @@
         <div class="field">
           <div class="ui left icon input">
             <i class="mail icon"></i>
-            <input type="text" name="email" placeholder="E-mail address">
+            <input type="text" name="email" placeholder="E-mail address" ng-model="registerInfo.email">
           </div>
         </div>
         <div class="field">
           <div class="ui left icon input">
             <i class="at icon"></i>
-            <input type="text" name="username" placeholder="Username">
+            <input type="text" name="username" placeholder="Username"  ng-model="registerInfo.username">
           </div>
         </div>
         <div class="field">
           <div class="ui left icon input">
             <i class="user icon"></i>
-            <input type="text" name="name" placeholder="Name">
+            <input type="text" name="name" placeholder="Name" ng-model="registerInfo.name">
           </div>
         </div>
         <div class="field">
           <div class="ui left icon input">
             <i class="lock icon"></i>
-            <input type="password" name="password" placeholder="Password">
+            <input type="password" name="password" placeholder="Password" ng-model="registerInfo.password">
           </div>
         </div>
-        <button class="ui button" type="submit">Register</button>
+        <button class="ui button" type="submit" ng-click="register()">Register</button>
       </form>
     </div>
   </div>
