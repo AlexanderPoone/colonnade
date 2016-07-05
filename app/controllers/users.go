@@ -65,7 +65,7 @@ func (c Users) Login() revel.Result {
     }
     json.Unmarshal([]byte(bodyBytes), &r)
 
-    result, identifier, id := models.LoginHandler(c.MongoSession, r.Email, r.Password)
+    result, identifier, id, name := models.LoginHandler(c.MongoSession, r.Email, r.Password)
 
     // start with initialise response interface
     data := make(map[string]interface{})
@@ -73,6 +73,8 @@ func (c Users) Login() revel.Result {
     switch result {
         case 0 :
             data["message"] = "Successfully Logged In"
+            data["data"] = make(map[string]interface{})
+            data["data"].(map[string]interface{})["name"] = name
             c.Session["email"] = identifier[0]
             c.Session["username"] = identifier[1]
             c.Session["userId"] = id

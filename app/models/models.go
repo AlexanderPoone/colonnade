@@ -67,19 +67,19 @@ func RegisterHandler(s *mgo.Session, email, username, passwd, name string) int {
     //
 }
 
-func LoginHandler(s *mgo.Session, email, passwd string) (int, [2]string, string) {
+func LoginHandler(s *mgo.Session, email, passwd string) (int, [2]string, string, string) {
     // validate password and check against database
-    if !userprofile.ValidateEmail(email) { return 1, [2]string{"", ""}, "" }
-    if !password.ValidatePassword(passwd) { return 1, [2]string{"", ""}, "" }
+    if !userprofile.ValidateEmail(email) { return 1, [2]string{"", ""}, "", "" }
+    if !password.ValidatePassword(passwd) { return 1, [2]string{"", ""}, "", "" }
 
     u := new(Users_t)
 
     userCollection(s).Find(bson.M{"identifier": email}).One(u)
 
-    if strings.Compare(u.Identifier[0], email) != 0 { return 2, [2]string{"", ""}, "" }
-    if u.Suspended { return 3, [2]string{"", ""}, "" }
+    if strings.Compare(u.Identifier[0], email) != 0 { return 2, [2]string{"", ""}, "", "" }
+    if u.Suspended { return 3, [2]string{"", ""}, "", "" }
 
     hashed, _, _ := password.HashWithSalt(passwd, u.Salt)
-    if strings.Compare(u.Passwd, hashed) != 0 { return 4, [2]string{"", ""}, "" }
-    return 0, u.Identifier, u.Id.String()
+    if strings.Compare(u.Passwd, hashed) != 0 { return 4, [2]string{"", ""}, "", "" }
+    return 0, u.Identifier, u.Id.String(), u.Name
 }
