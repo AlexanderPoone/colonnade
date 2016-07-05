@@ -62,7 +62,7 @@ func (c Users) Login() revel.Result {
     }
     json.Unmarshal([]byte(bodyBytes), &r)
 
-    result := models.LoginHandler(c.MongoSession, r.Email, r.Password)
+    result, identifier, id := models.LoginHandler(c.MongoSession, r.Email, r.Password)
 
     // start with initialise response interface
     data := make(map[string]interface{})
@@ -70,8 +70,17 @@ func (c Users) Login() revel.Result {
     switch result {
         case 0 :
             data["message"] = "Successfully Logged In"
+            c.Session["email"] = identifier[0]
+            c.Session["username"] = identifier[1]
+            c.Session["userId"] = id
         case 1 :
-            data["message"] = "Invalid Log in"
+            data["message"] = "Invalid Login Details"
+        case 2 :
+            data["message"] = "Email is not registered"
+        case 3 :
+            data["message"] = "User has been suspended"
+        case 4 :
+            data["message"] = "Password incorrect"
     }
     return c.RenderJson(data)
 }

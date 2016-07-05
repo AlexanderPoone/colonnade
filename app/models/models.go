@@ -2,18 +2,24 @@ package models
 
 import (
     "gopkg.in/mgo.v2"
-    //"gopkg.in/mgo.v2/bson"
+    "gopkg.in/mgo.v2/bson"
     "github.com/revel/revel"
     "github.com/ip4368/go-userprofile"
     "github.com/ip4368/go-password"
+    "strings"
 )
 
 type Users_t struct {
-    Identifier [2]string
-    Passwd string
-    Salt string
-    PrevPasswd []string
-    Suspended bool
+    Identifier [2]string `bson:"identifier"`
+    Passwd string `bson:"passwd"`
+    Salt string `bson:"salt"`
+    PrevPasswd []string `bson:"prevpasswd"`
+    Suspended bool `bson:"suspended"`
+    Id    bson.ObjectId `bson:"_id,omitempty"`
+}
+
+type LoginQuery_t struct {
+    Identifier [1]string
 }
 
 func GuardUsers() {
@@ -36,6 +42,10 @@ func GuardUsers() {
     }
 }
 
+func userCollection(s *mgo.Session) *mgo.Collection {
+    return s.DB("colonnade").C("users")
+}
+
 func RegisterHandler(s *mgo.Session, email, username, passwd string) int {
     // validate all email, username and password
     if !userprofile.ValidateEmail(email) { return 1 }
@@ -44,26 +54,33 @@ func RegisterHandler(s *mgo.Session, email, username, passwd string) int {
 
     hashed, salt, _ := password.HashAutoSalt(passwd)
     doc := Users_t{
-        [2]string{email, username},
-        hashed,
-        salt,
-        []string{},
-        false,
+        Identifier: [2]string{email, username},
+        Passwd: hashed,
+        Salt: salt,
+        PrevPasswd: []string{},
+        Suspended: false,
     }
 
-    // get collection from mgo session
-    users := s.DB("colonnade").C("users")
-    err := users.Insert(doc)
+    err := userCollection(s).Insert(doc)
 
     if err != nil { return 4 }
     return 0
     //
 }
 
-func LoginHandler(s *mgo.Session, email, passwd string) int {
+func LoginHandler(s *mgo.Session, email, passwd string) (int, [2]string, string) {
     // validate password and check against database
-    userprofile.ValidateEmail(email)
-    password.ValidatePassword(passwd)
+    if !userprofile.ValidateEmail(email) { return 1, [2]string{"", ""}, "" }
+    if !password.ValidatePassword(passwd) { return 1, [2]string{"", ""}, "" }
 
-    return 0
+    u := new(Users_t)
+
+    userCollection(s).Find(bson.M{"identifier": email}).One(u)
+
+    if strings.Compare(u.Identifier[0], email) != 0 { return 2, [2]string{"", ""}, "" }
+    if u.Suspended { return 3, [2]string{"", ""}, "" }
+
+    hashed, _, _ := password.HashWithSalt(passwd, u.Salt)
+    if strings.Compare(u.Passwd, hashed) != 0 { return 4, [2]string{"", ""}, "" }
+    return 0, u.Identifier, u.Id.String()
 }
