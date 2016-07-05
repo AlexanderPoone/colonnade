@@ -1,5 +1,5 @@
 # colonnade
-This is a project that trying to provide a better learning environment for new computer science students. The aim if target students who need to code with structured programming language, such as C.
+This is a project that trying to provide a better learning environment for new computer science students. The aim is to help the targeted students who need to learn coding with structured programming language, such as C. This is a project using Go as the programming language and Revel as the web framework.
 
 # Welcome to Revel
 
