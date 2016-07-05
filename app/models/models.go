@@ -62,7 +62,7 @@ func RegisterHandler(s *mgo.Session, email, username, passwd, name string) int {
 
     err := userCollection(s).Insert(doc)
 
-    if err != nil { return 4 }
+    if err != nil { return 5 }
     return 0
     //
 }
