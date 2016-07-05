@@ -34,7 +34,7 @@ app
 })
 .controller("loginCtrl", function($scope, $rootScope, $location, login, register){
 	$scope.login = function() {
-		login($scope.loginInfo.email, $scope.loginInfo.password, function(data){
+		login.launch($scope.loginInfo.email, $scope.loginInfo.password, function(data){
 			if(data.error == 0){
 				$location.url("/dashboard/");
 				$scope.loginErrMsg = "";
@@ -82,18 +82,35 @@ app
 
 })
 .factory('login', function($http){
-	return function(email, password, callback){
-		$http.post(API_URL + '/user/login', {
-			email: email,
-			password: password
-		}, {
-			withCredentials: true,
-		}).then(function successCallback(response) {
-			callback(response.data);
-		}, function errorCallback(response) {
-			console.log("error");
-			callback(response.data);
-		});
+	var user = {};
+	user.loggedIn = false;
+	user.name = "";
+	user.email = "";
+	return {
+		launch: function(email, password, callback){
+			$http.post(API_URL + '/user/login', {
+				email: email,
+				password: password
+			}, {
+				withCredentials: true,
+			}).then(function successCallback(response) {
+				if(response.data.error == 0){
+					user.loggedIn = true;
+					user.name = response.data.data.name;
+					user.email = email;
+				}
+				callback(response.data);
+			}, function errorCallback(response) {
+				console.log("error");
+				callback(response.data);
+			});
+		},
+		getUser: function(){
+			return user;
+		},
+		checkLogin: function(){
+			return null;
+		}
 	}
 })
 .factory('register', function($http){
