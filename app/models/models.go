@@ -18,10 +18,6 @@ type Users_t struct {
     Id    bson.ObjectId `bson:"_id,omitempty"`
 }
 
-type LoginQuery_t struct {
-    Identifier [1]string
-}
-
 func GuardUsers() {
     localDBSession, err := mgo.Dial("mongodb://localhost/colonnade")
     if err != nil {
