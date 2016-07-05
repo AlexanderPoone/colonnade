@@ -1,6 +1,11 @@
 var app = angular.module("Colonnade", ['ngRoute', 'ngCookies'])
 var API_URL = './api';
 
+var email_regex = /^[a-z0-9._%+-]+@(?:[a-z0-9-]+\.)+[a-z]{2,4}$/;
+var password_regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/;
+var username_regex = /^[a-zA-Z0-9]{2,12}$/;
+var name_regex = /^.{3,}$/;
+
 app
 .config(function ($routeProvider, $locationProvider, $httpProvider){
 	$httpProvider.useApplyAsync(true);
@@ -32,24 +37,45 @@ app
 		login($scope.loginInfo.email, $scope.loginInfo.password, function(data){
 			if(data.error == 0){
 				$location.url("/");
+				$scope.loginErrMsg = "";
+			}else{
+				$scope.loginErrMsg = data.message;
 			}
 		});
 	};
 	$scope.register = function() {
-		register(
-			$scope.registerInfo.email,
-			$scope.registerInfo.username,
-			$scope.registerInfo.name,
-			$scope.registerInfo.password,
-			function(data){
-				if(data.error == 0){
-					$scope.registerInfo.email = ""
-					$scope.registerInfo.username = ""
-					$scope.registerInfo.name = ""
-					$scope.registerInfo.password = ""
+		var ri = $scope.registerInfo;
+		var invalid = {}
+		if(ri){
+			invalid.email = !Boolean(ri.email ? ri.email.match(email_regex) : false);
+			invalid.username = !Boolean(ri.username ? ri.username.match(username_regex) : false);
+			invalid.name = !Boolean(ri.name ? ri.name.match(name_regex) : false);
+			invalid.password = !Boolean(ri.password ? ri.password.match(password_regex) : false);
+		}else{
+			invalid.email = invalid.username = invalid.name = invalid.password = true;
+		}
+
+		if (!invalid.email && !invalid.username && !invalid.name && !invalid.password) {
+			register(
+				ri.email,
+				ri.username,
+				ri.name,
+				ri.password,
+				function(data){
+					if(data.error == 0){
+						$scope.registerInfo.email = "";
+						$scope.registerInfo.username = "";
+						$scope.registerInfo.name = "";
+						$scope.registerInfo.password = "";
+						$scope.regSucc = true;
+						$scope.regErrMsg = "";
+					}else{
+						$scope.regErrMsg = data.message;
+					}
 				}
-			}
-		);
+			);
+		}
+		$scope.regInvalid = invalid;
 	};
 })
 .controller("404Ctrl", function($scope, $rootScope, $http){

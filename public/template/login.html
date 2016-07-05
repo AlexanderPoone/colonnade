@@ -16,6 +16,10 @@
           </div>
         </div>
         <button class="ui blue button" type="submit" ng-click="login()">Login</button>
+        <div class="ui message error-message" ng-show="loginErrMsg">
+          <div class="header">Oops...</div>
+          <p ng-bind="loginErrMsg"></p>
+        </div>
       </form>
     </div>
   </div>
@@ -23,31 +27,39 @@
     <div class="login-center">
       <h1 class="ui header">Register</h1>
       <form class="ui form">
-        <div class="field">
+        <div class="field" ng-class="{error: regInvalid.email}">
           <div class="ui left icon input">
             <i class="mail icon"></i>
             <input type="text" name="email" placeholder="E-mail address" ng-model="registerInfo.email">
           </div>
         </div>
-        <div class="field">
+        <div class="field" ng-class="{error: regInvalid.username}">
           <div class="ui left icon input">
             <i class="at icon"></i>
             <input type="text" name="username" placeholder="Username"  ng-model="registerInfo.username">
           </div>
         </div>
-        <div class="field">
+        <div class="field" ng-class="{error: regInvalid.name}">
           <div class="ui left icon input">
             <i class="user icon"></i>
             <input type="text" name="name" placeholder="Name" ng-model="registerInfo.name">
           </div>
         </div>
-        <div class="field">
+        <div class="field" ng-class="{error: regInvalid.password}">
           <div class="ui left icon input">
             <i class="lock icon"></i>
             <input type="password" name="password" placeholder="Password" ng-model="registerInfo.password">
           </div>
         </div>
         <button class="ui button" type="submit" ng-click="register()">Register</button>
+        <div class="ui message success-message" ng-hide="!regSucc">
+          <div class="header">Done</div>
+          <p>Thank you for registering with Colonnade. Happy Coding :)</p>
+        </div>
+        <div class="ui message error-message" ng-show="regErrMsg">
+          <div class="header">Oops...</div>
+          <p ng-bind="regErrMsg"></p>
+        </div>
       </form>
     </div>
   </div>
