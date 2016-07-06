@@ -10,6 +10,10 @@ import (
     "time"
 )
 
+const COODRINATORS = 0
+const TUTORS = 1
+const STUDENTS = 2
+
 type User_t struct {
     Identifier [2]string `bson:"identifier"`
     Passwd string `bson:"passwd"`
@@ -24,9 +28,7 @@ type Course_t struct {
     Name string `bson:"name"`
     Description string `bson:"description"`
     Suspended bool `bson:"suspended,omitempty"`
-    Coordinators []bson.ObjectId `bson:"coordinators,omitempty"`
-    Tutors []bson.ObjectId `bson:"tutors,omitempty"`
-    Students []bson.ObjectId `bson:"students,omitempty"`
+    Users map[string]int `bson:users,omitempty`
     TimeCreated time.Time `bson:"timeCreated,omitempty"`
     Id    bson.ObjectId `bson:"_id,omitempty"`
 }
@@ -119,11 +121,7 @@ func CoursesForUser(s *mgo.Session, UserId_str string) (int, []Course_t) {
     var result []Course_t
     err := coursesCollection(s).Find(bson.M{
         "$and": []bson.M{
-            bson.M{"$or": []bson.M{
-                bson.M{"coordinators": UserId},
-                bson.M{"tutors": UserId},
-                bson.M{"students": UserId},
-            }},
+            bson.M{UserId.String(): bson.M{"$exists": true }},
             bson.M{"suspended": true},
         },
     }).Select(bson.M{
