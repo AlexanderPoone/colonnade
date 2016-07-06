@@ -17,6 +17,7 @@ GET     /public/*filepath                       Static.Serve("public")
 POST	/api/user/register                      Users.Register()
 POST	/api/user/login                         Users.Login()
 GET		/api/user/logout                        Users.Logout()
+GET		/api/user/loginInfo                     Users.LoginInfo()
 
 # Catch all
 #*      /:controller/:action                    :controller.:action

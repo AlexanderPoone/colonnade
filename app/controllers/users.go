@@ -77,6 +77,7 @@ func (c Users) Login() revel.Result {
             data["data"].(map[string]interface{})["name"] = name
             c.Session["email"] = identifier[0]
             c.Session["username"] = identifier[1]
+            c.Session["name"] = name
             c.Session["userId"] = id
         case 1 :
             data["message"] = "Invalid Login Details"
@@ -94,6 +95,7 @@ func (c Users) Logout() revel.Result {
     result := models.LogoutHandler(
         c.Session["email"],
         c.Session["username"],
+        c.Session["name"],
         c.Session["userId"],
     )
 
@@ -105,7 +107,30 @@ func (c Users) Logout() revel.Result {
             data["message"] = "Successfully Logged Out"
             if c.Session["email"] != "" {c.Session["email"] = "" }
             if c.Session["username"] != "" { c.Session["username"] = "" }
+            if c.Session["name"] != "" { c.Session["name"] = "" }
             if c.Session["userId"] != "" { c.Session["userId"] = "" }
+        case 1 :
+            data["message"] = "Not Logged In"
+    }
+    return c.RenderJson(data)
+}
+
+func (c Users) LoginInfo() revel.Result {
+    result := models.LoginStatus(
+        c.Session["email"],
+        c.Session["username"],
+        c.Session["name"],
+        c.Session["userId"],
+    )
+
+    data := make(map[string]interface{})
+    data["error"] = result
+    switch result {
+        case 0 :
+            data["message"] = "Logged In"
+            data["data"] = make(map[string]interface{})
+            data["data"].(map[string]interface{})["name"] = c.Session["name"]
+            data["data"].(map[string]interface{})["email"] = c.Session["email"]
         case 1 :
             data["message"] = "Not Logged In"
     }

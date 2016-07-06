@@ -84,7 +84,11 @@ func LoginHandler(s *mgo.Session, email, passwd string) (int, [2]string, string,
     return 0, u.Identifier, u.Id.String(), u.Name
 }
 
-func LogoutHandler(email, username, userId string) int {
-    if(email == "" && username == "" && userId == "") { return 1 };
+func LoginStatus(email, username, name, userId string) int {
+    if(email == "" && username == "" && name == "" && userId == "") { return 1 }
     return 0;
+}
+
+func LogoutHandler(email, username, name, userId string) int {
+    return LoginStatus(email, username, name, userId)
 }

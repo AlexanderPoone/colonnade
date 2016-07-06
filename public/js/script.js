@@ -93,8 +93,27 @@ app
 	user.email = "";
 	globScope = null;
 	return {
-		init: function(scope){
+		init: function(scope, callback){
 			globScope = scope;
+			$http.get(API_URL + '/user/loginInfo', {
+				withCredentials: true,
+			}).then(function successCallback(response) {
+				if(response.data.error == 0){
+					user.loggedIn = true;
+					user.name = response.data.data.name;
+					user.email = response.data.data.email;
+					globScope.login = true;
+				}else{
+					user.loggedIn = false;
+					user.name = "";
+					user.email = "";
+					globScope.login = false;
+				}
+				if(callback) callback(response.data);
+			}, function errorCallback(response) {
+				console.log("error");
+				if(callback) callback(response.data);
+			});
 		},
 		launch: function(email, password, callback){
 			$http.post(API_URL + '/user/login', {
