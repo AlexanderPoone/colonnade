@@ -13,9 +13,13 @@ GET     /favicon.ico                            404
 GET     /public/*filepath                       Static.Serve("public")
 
 # Start of API
-# user(s) endpoint
+# User(s) endpoint
 POST	/api/user/register                      Users.Register()
 POST	/api/user/login                         Users.Login()
+
+# Course(s) endpoint
+#GET		/api/courses							Courses.UserAllCourses()
+#GET		/api/course/:Id							Courses.Course()
 
 # Catch all
 #*      /:controller/:action                    :controller.:action

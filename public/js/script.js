@@ -23,16 +23,14 @@ app
 		templateUrl:'public/template/404.html',
 		controller:'404Ctrl'});
 })
-.controller("GlobCtrl", function($scope, $rootScope, $http){
-
+.controller("GlobCtrl", function($scope, $http, login){
+	login.init($scope);
 })
-.controller("mainCtrl", function($scope, $rootScope, $http){
-
+.controller("mainCtrl", function($scope, $http, login){
 })
-.controller("dashboardCtrl", function($scope, $rootScope, $http){
-
+.controller("dashboardCtrl", function($scope, $http, login){
 })
-.controller("loginCtrl", function($scope, $rootScope, $location, login, register){
+.controller("loginCtrl", function($scope, $location, login, register){
 	$scope.login = function() {
 		login.launch($scope.loginInfo.email, $scope.loginInfo.password, function(data){
 			if(data.error == 0){
@@ -78,7 +76,7 @@ app
 		$scope.regInvalid = invalid;
 	};
 })
-.controller("404Ctrl", function($scope, $rootScope, $http){
+.controller("404Ctrl", function($scope, $http, login){
 
 })
 .factory('login', function($http){
@@ -86,7 +84,11 @@ app
 	user.loggedIn = false;
 	user.name = "";
 	user.email = "";
+	globScope = null;
 	return {
+		init: function(scope){
+			globScope = scope;
+		},
 		launch: function(email, password, callback){
 			$http.post(API_URL + '/user/login', {
 				email: email,
@@ -98,6 +100,7 @@ app
 					user.loggedIn = true;
 					user.name = response.data.data.name;
 					user.email = email;
+					globScope.login = true;
 				}
 				callback(response.data);
 			}, function errorCallback(response) {
