@@ -130,6 +130,7 @@ func CoursesForUser(s *mgo.Session, UserIdHex string) (int, []Course_t, []Course
         "description": 1,
         "users": 1,
     }).All(&result)
+    if err != nil { return 3, []Course_t{}, []Course_t{}, []Course_t{} }
 
     var groups [3][]Course_t
     for _, value := range result {
@@ -138,8 +139,6 @@ func CoursesForUser(s *mgo.Session, UserIdHex string) (int, []Course_t, []Course
                 Description: value.Description,
             })
     }
-
-    if err != nil { return 3, []Course_t{}, []Course_t{}, []Course_t{} }
 
     return 0, groups[0], groups[1], groups[2]
 }
