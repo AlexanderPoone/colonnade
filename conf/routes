@@ -20,8 +20,11 @@ GET		/api/user/logout                        Users.Logout()
 GET		/api/user/loginInfo                     Users.LoginInfo()
 
 # Course(s) endpoint
-GET		/api/courses							Courses.CoursesForUser()
-GET		/api/course/:Id							Courses.Course()
+GET		/api/courses                            Courses.CoursesForUser()
+GET		/api/course/:Id                         Courses.Course()
+
+# Admin(s) endpoint
+GET		/api/admin/isAdmin                      Admins.IsAdmin()
 
 # Catch all
 #*      /:controller/:action                    :controller.:action

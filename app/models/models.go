@@ -33,16 +33,39 @@ type Course_t struct {
     Id    bson.ObjectId `bson:"_id,omitempty"`
 }
 
+type Admin_t struct {
+    UserId bson.ObjectId `bson:"uid"`
+    Id     bson.ObjectId `bson:"_id,omitempty"`
+}
+
 func GuardUsers() {
     localDBSession, err := mgo.Dial("mongodb://localhost/colonnade")
     if err != nil {
         // Only warn since we'll retry later for each request
         revel.WARN.Printf("Could not connect to Mongo DB. Error: %s", err)
     } else {
-        colonnadeDB := localDBSession.DB("colonnade")
-        users := colonnadeDB.C("users")
+        users := usersCollection(localDBSession)
         index := mgo.Index{
             Key: []string{"identifier"},
+            Unique: true,
+            DropDups: true,
+            Background: true,
+            Sparse: true,
+        }
+        users.EnsureIndex(index)
+        localDBSession.Close()
+    }
+}
+
+func GuardAdmins() {
+    localDBSession, err := mgo.Dial("mongodb://localhost/colonnade")
+    if err != nil {
+        // Only warn since we'll retry later for each request
+        revel.WARN.Printf("Could not connect to Mongo DB. Error: %s", err)
+    } else {
+        users := adminsCollection(localDBSession)
+        index := mgo.Index{
+            Key: []string{"uid"},
             Unique: true,
             DropDups: true,
             Background: true,
@@ -59,6 +82,10 @@ func usersCollection(s *mgo.Session) *mgo.Collection {
 
 func coursesCollection(s *mgo.Session) *mgo.Collection {
     return s.DB("colonnade").C("courses")
+}
+
+func adminsCollection(s *mgo.Session) *mgo.Collection {
+    return s.DB("colonnade").C("admins")
 }
 
 func RegisterHandler(s *mgo.Session, email, username, passwd, name string) int {
@@ -129,6 +156,7 @@ func CoursesForUser(s *mgo.Session, UserIdHex string) (int, []Course_t, []Course
         "name": 1,
         "description": 1,
         "users": 1,
+        "_id": 1,
     }).All(&result)
     if err != nil { return 3, []Course_t{}, []Course_t{}, []Course_t{} }
 
@@ -137,8 +165,22 @@ func CoursesForUser(s *mgo.Session, UserIdHex string) (int, []Course_t, []Course
         groups[value.Users[UserIdStr]] = append(groups[value.Users[UserIdStr]], Course_t{
                 Name: value.Name,
                 Description: value.Description,
+                Id: value.Id,
             })
     }
 
     return 0, groups[0], groups[1], groups[2]
+}
+
+func CheckAdmin(s *mgo.Session, UserIdHex string) int {
+    isValidId := bson.IsObjectIdHex(UserIdHex)
+    if !isValidId { return 3 }
+    UserId := bson.ObjectIdHex(UserIdHex)
+
+    var result Admin_t
+    err := adminsCollection(s).Find(bson.M{"uid": UserId}).One(&result)
+    if err != nil { return 4 }
+
+    if result.UserId != UserId { return 2 }
+    return 0
 }
