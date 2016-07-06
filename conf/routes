@@ -19,5 +19,9 @@ POST	/api/user/login                         Users.Login()
 GET		/api/user/logout                        Users.Logout()
 GET		/api/user/loginInfo                     Users.LoginInfo()
 
+# Course(s) endpoint
+GET		/api/courses							Courses.CoursesForUser()
+GET		/api/course/:Id							Courses.Course()
+
 # Catch all
 #*      /:controller/:action                    :controller.:action

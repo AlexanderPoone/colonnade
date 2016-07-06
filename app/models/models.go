@@ -7,15 +7,27 @@ import (
     "github.com/ip4368/go-userprofile"
     "github.com/ip4368/go-password"
     "strings"
+    "time"
 )
 
-type Users_t struct {
+type User_t struct {
     Identifier [2]string `bson:"identifier"`
     Passwd string `bson:"passwd"`
     Salt string `bson:"salt"`
     PrevPasswd []string `bson:"prevpasswd"`
     Suspended bool `bson:"suspended"`
-    Name string `bson: name`
+    Name string `bson:"name"`
+    Id    bson.ObjectId `bson:"_id,omitempty"`
+}
+
+type Course_t struct {
+    Name string `bson:"name"`
+    Description string `bson:"description"`
+    Suspended bool `bson:"suspended,omitempty"`
+    Coordinators []bson.ObjectId `bson:"coordinators,omitempty"`
+    Tutors []bson.ObjectId `bson:"tutors,omitempty"`
+    Students []bson.ObjectId `bson:"students,omitempty"`
+    TimeCreated time.Time `bson:"timeCreated,omitempty"`
     Id    bson.ObjectId `bson:"_id,omitempty"`
 }
 
@@ -39,8 +51,12 @@ func GuardUsers() {
     }
 }
 
-func userCollection(s *mgo.Session) *mgo.Collection {
+func usersCollection(s *mgo.Session) *mgo.Collection {
     return s.DB("colonnade").C("users")
+}
+
+func coursesCollection(s *mgo.Session) *mgo.Collection {
+    return s.DB("colonnade").C("courses")
 }
 
 func RegisterHandler(s *mgo.Session, email, username, passwd, name string) int {
@@ -51,7 +67,7 @@ func RegisterHandler(s *mgo.Session, email, username, passwd, name string) int {
     if !userprofile.ValidateName(name) { return 4 }
 
     hashed, salt, _ := password.HashAutoSalt(passwd)
-    doc := Users_t{
+    doc := User_t{
         Identifier: [2]string{email, username},
         Passwd: hashed,
         Salt: salt,
@@ -60,7 +76,7 @@ func RegisterHandler(s *mgo.Session, email, username, passwd, name string) int {
         Name: name,
     }
 
-    err := userCollection(s).Insert(doc)
+    err := usersCollection(s).Insert(doc)
 
     if err != nil { return 5 }
     return 0
@@ -72,16 +88,18 @@ func LoginHandler(s *mgo.Session, email, passwd string) (int, [2]string, string,
     if !userprofile.ValidateEmail(email) { return 1, [2]string{"", ""}, "", "" }
     if !password.ValidatePassword(passwd) { return 1, [2]string{"", ""}, "", "" }
 
-    u := new(Users_t)
+    u := new(User_t)
 
-    userCollection(s).Find(bson.M{"identifier": email}).One(u)
+    usersCollection(s).Find(bson.M{
+        "identifier": email,
+    }).One(u)
 
     if strings.Compare(u.Identifier[0], email) != 0 { return 2, [2]string{"", ""}, "", "" }
     if u.Suspended { return 3, [2]string{"", ""}, "", "" }
 
     hashed, _, _ := password.HashWithSalt(passwd, u.Salt)
     if strings.Compare(u.Passwd, hashed) != 0 { return 4, [2]string{"", ""}, "", "" }
-    return 0, u.Identifier, u.Id.String(), u.Name
+    return 0, u.Identifier, u.Id.Hex(), u.Name
 }
 
 func LoginStatus(email, username, name, userId string) int {
@@ -91,4 +109,29 @@ func LoginStatus(email, username, name, userId string) int {
 
 func LogoutHandler(email, username, name, userId string) int {
     return LoginStatus(email, username, name, userId)
+}
+
+func CoursesForUser(s *mgo.Session, UserId_str string) (int, []Course_t) {
+    isValidId := bson.IsObjectIdHex(UserId_str)
+    if !isValidId { return 2, []Course_t{} }
+    UserId := bson.ObjectIdHex(UserId_str)
+
+    var result []Course_t
+    err := coursesCollection(s).Find(bson.M{
+        "$and": []bson.M{
+            bson.M{"$or": []bson.M{
+                bson.M{"coordinators": UserId},
+                bson.M{"tutors": UserId},
+                bson.M{"students": UserId},
+            }},
+            bson.M{"suspended": true},
+        },
+    }).Select(bson.M{
+        "name": 1,
+        "description": 1,
+    }).All(&result)
+
+    if err != nil { return 3, []Course_t{} }
+
+    return 0, result
 }
