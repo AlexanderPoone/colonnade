@@ -16,10 +16,7 @@ GET     /public/*filepath                       Static.Serve("public")
 # User(s) endpoint
 POST	/api/user/register                      Users.Register()
 POST	/api/user/login                         Users.Login()
-
-# Course(s) endpoint
-#GET		/api/courses							Courses.UserAllCourses()
-#GET		/api/course/:Id							Courses.Course()
+GET		/api/user/logout                        Users.Logout()
 
 # Catch all
 #*      /:controller/:action                    :controller.:action

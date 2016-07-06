@@ -23,8 +23,15 @@ app
 		templateUrl:'public/template/404.html',
 		controller:'404Ctrl'});
 })
-.controller("GlobCtrl", function($scope, $http, login){
+.controller("GlobCtrl", function($scope, $http, $location, login){
 	login.init($scope);
+	$scope.logout = function(){
+		login.logout(function(data){
+			if(data.error == 0){
+				$location.url("/");
+			}
+		});
+	}
 })
 .controller("mainCtrl", function($scope, $http, login){
 })
@@ -102,10 +109,10 @@ app
 					user.email = email;
 					globScope.login = true;
 				}
-				callback(response.data);
+				if(callback) callback(response.data);
 			}, function errorCallback(response) {
 				console.log("error");
-				callback(response.data);
+				if(callback) callback(response.data);
 			});
 		},
 		getUser: function(){
@@ -113,6 +120,22 @@ app
 		},
 		checkLogin: function(){
 			return null;
+		},
+		logout: function(callback){
+			$http.get(API_URL + '/user/logout', {
+				withCredentials: true,
+			}).then(function successCallback(response) {
+				if(response.data.error == 0){
+					user.loggedIn = false;
+					user.name = "";
+					user.email = "";
+					globScope.login = false;
+				}
+				if(callback) callback(response.data);
+			}, function errorCallback(response) {
+				console.log("error");
+				if(callback) callback(response.data);
+			});
 		}
 	}
 })
@@ -126,10 +149,10 @@ app
 		}, {
 			withCredentials: true,
 		}).then(function successCallback(response) {
-			callback(response.data);
+			if(callback) callback(response.data);
 		}, function errorCallback(response) {
 			console.log("error");
-			callback(response.data);
+			if(callback) callback(response.data);
 		});
 	}
 });

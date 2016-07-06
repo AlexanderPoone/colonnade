@@ -83,3 +83,8 @@ func LoginHandler(s *mgo.Session, email, passwd string) (int, [2]string, string,
     if strings.Compare(u.Passwd, hashed) != 0 { return 4, [2]string{"", ""}, "", "" }
     return 0, u.Identifier, u.Id.String(), u.Name
 }
+
+func LogoutHandler(email, username, userId string) int {
+    if(email == "" && username == "" && userId == "") { return 1 };
+    return 0;
+}

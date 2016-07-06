@@ -89,3 +89,25 @@ func (c Users) Login() revel.Result {
     }
     return c.RenderJson(data)
 }
+
+func (c Users) Logout() revel.Result {
+    result := models.LogoutHandler(
+        c.Session["email"],
+        c.Session["username"],
+        c.Session["userId"],
+    )
+
+    // start with initialise response interface
+    data := make(map[string]interface{})
+    data["error"] = result
+    switch result {
+        case 0 :
+            data["message"] = "Successfully Logged Out"
+            if c.Session["email"] != "" {c.Session["email"] = "" }
+            if c.Session["username"] != "" { c.Session["username"] = "" }
+            if c.Session["userId"] != "" { c.Session["userId"] = "" }
+        case 1 :
+            data["message"] = "Not Logged In"
+    }
+    return c.RenderJson(data)
+}
