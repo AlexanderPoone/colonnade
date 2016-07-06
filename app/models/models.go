@@ -18,7 +18,7 @@ type User_t struct {
     Identifier [2]string `bson:"identifier"`
     Passwd string        `bson:"passwd"`
     Salt string          `bson:"salt"`
-    PrevPasswd []string  `bson:"prevpasswd"`
+    PrevPasswd []string  `bson:"prevpasswd,omitempty"`
     Suspended bool       `bson:"suspended"`
     Name string          `bson:"name"`
     Id    bson.ObjectId  `bson:"_id,omitempty"`
@@ -28,7 +28,7 @@ type Course_t struct {
     Name string           `bson:"name"`
     Description string    `bson:"description"`
     Suspended bool        `bson:"suspended,omitempty"`
-    Users map[string]int  `bson:users,omitempty`
+    Users map[string]int  `bson:"users,omitempty"`
     TimeCreated time.Time `bson:"timeCreated,omitempty"`
     Id    bson.ObjectId   `bson:"_id,omitempty"`
 }
@@ -121,6 +121,8 @@ func LoginHandler(s *mgo.Session, email, passwd string) (int, [2]string, string,
 
     usersCollection(s).Find(bson.M{
         "identifier": email,
+    }).Select(bson.M{
+        "prevpasswd": 0,
     }).One(u)
 
     if strings.Compare(u.Identifier[0], email) != 0 { return 2, [2]string{"", ""}, "", "" }
@@ -149,7 +151,7 @@ func CoursesForUser(s *mgo.Session, UserIdHex string) (int, []Course_t, []Course
     var result []Course_t
     err := coursesCollection(s).Find(bson.M{
         "$and": []bson.M{
-            bson.M{UserIdStr: bson.M{"$exists": true }},
+            bson.M{UserIdStr: bson.M{"$exists": true}},
             bson.M{"suspended": true},
         },
     }).Select(bson.M{
