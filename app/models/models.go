@@ -169,7 +169,7 @@ func CoursesForUser(s *mgo.Session, UserIdHex string) (int, []Course_t, []Course
             })
     }
 
-    return 0, groups[0], groups[1], groups[2]
+    return 0, groups[COODRINATORS], groups[TUTORS], groups[STUDENTS]
 }
 
 func CheckAdmin(s *mgo.Session, UserIdHex string) int {
