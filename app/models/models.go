@@ -113,23 +113,33 @@ func LogoutHandler(email, username, name, userId string) int {
     return LoginStatus(email, username, name, userId)
 }
 
-func CoursesForUser(s *mgo.Session, UserId_str string) (int, []Course_t) {
-    isValidId := bson.IsObjectIdHex(UserId_str)
-    if !isValidId { return 2, []Course_t{} }
-    UserId := bson.ObjectIdHex(UserId_str)
+func CoursesForUser(s *mgo.Session, UserIdHex string) (int, []Course_t, []Course_t, []Course_t) {
+    isValidId := bson.IsObjectIdHex(UserIdHex)
+    if !isValidId { return 2, []Course_t{}, []Course_t{}, []Course_t{} }
+    UserId := bson.ObjectIdHex(UserIdHex)
+    UserIdStr := UserId.String()
 
     var result []Course_t
     err := coursesCollection(s).Find(bson.M{
         "$and": []bson.M{
-            bson.M{UserId.String(): bson.M{"$exists": true }},
+            bson.M{UserIdStr: bson.M{"$exists": true }},
             bson.M{"suspended": true},
         },
     }).Select(bson.M{
         "name": 1,
         "description": 1,
+        "users": 1,
     }).All(&result)
 
-    if err != nil { return 3, []Course_t{} }
+    var groups [3][]Course_t
+    for _, value := range result {
+        groups[value.Users[UserIdStr]] = append(groups[value.Users[UserIdStr]], Course_t{
+                Name: value.Name,
+                Description: value.Description,
+            })
+    }
 
-    return 0, result
+    if err != nil { return 3, []Course_t{}, []Course_t{}, []Course_t{} }
+
+    return 0, groups[0], groups[1], groups[2]
 }

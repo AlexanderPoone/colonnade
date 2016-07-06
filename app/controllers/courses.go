@@ -25,9 +25,9 @@ func (c Courses) CoursesForUser() revel.Result {
         c.Session["userId"],
     )
     var result int = 0
-    var retData []models.Course_t
+    var coordinator, tutor, student []models.Course_t
     if loginStat == 0 {
-    	result, retData = models.CoursesForUser(c.MongoSession, c.Session["userId"])
+    	result, coordinator, tutor, student = models.CoursesForUser(c.MongoSession, c.Session["userId"])
     } else { result = 1 }
 
     // start with initialise response interface
@@ -36,7 +36,10 @@ func (c Courses) CoursesForUser() revel.Result {
     switch result {
         case 0 :
             data["message"] = "Sucess"
-            data["data"] = retData
+            data["data"] = make(map[string]interface{})
+            data["data"].(map[string]interface{})["asCoordinator"] = coordinator
+            data["data"].(map[string]interface{})["asTutor"] = tutor
+            data["data"].(map[string]interface{})["asStudent"] = student
         case 1 :
             data["message"] = "User has not logged in"
         case 2 :
