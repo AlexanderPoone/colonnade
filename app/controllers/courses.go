@@ -2,8 +2,8 @@ package controllers
 
 import (
     "github.com/revel/revel"
-    "encoding/json"
-    "io/ioutil"
+    //"encoding/json"
+    //"io/ioutil"
     "github.com/janekolszak/revmgo"
     "github.com/ip4368/colonnade/app/models"
 )
@@ -50,14 +50,7 @@ func (c Courses) CoursesForUser() revel.Result {
     return c.RenderJson(data)
 }
 
-func (c Courses) Course() revel.Result {
-	var r RegisterProfile
-    var bodyBytes []byte
-    if c.Request.Body != nil {
-        bodyBytes, _ = ioutil.ReadAll(c.Request.Body)
-    }
-    json.Unmarshal([]byte(bodyBytes), &r)
-
+func (c Courses) Course(CourseIdHex string) revel.Result {
     //result := models.RegisterHandler(c.MongoSession, r.Email, r.Username, r.Password, r.Name)
     result := 0
 
