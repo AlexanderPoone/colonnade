@@ -16,21 +16,21 @@ const STUDENTS = 2
 
 type User_t struct {
     Identifier [2]string `bson:"identifier"`
-    Passwd string `bson:"passwd"`
-    Salt string `bson:"salt"`
-    PrevPasswd []string `bson:"prevpasswd"`
-    Suspended bool `bson:"suspended"`
-    Name string `bson:"name"`
-    Id    bson.ObjectId `bson:"_id,omitempty"`
+    Passwd string        `bson:"passwd"`
+    Salt string          `bson:"salt"`
+    PrevPasswd []string  `bson:"prevpasswd"`
+    Suspended bool       `bson:"suspended"`
+    Name string          `bson:"name"`
+    Id    bson.ObjectId  `bson:"_id,omitempty"`
 }
 
 type Course_t struct {
-    Name string `bson:"name"`
-    Description string `bson:"description"`
-    Suspended bool `bson:"suspended,omitempty"`
-    Users map[string]int `bson:users,omitempty`
+    Name string           `bson:"name"`
+    Description string    `bson:"description"`
+    Suspended bool        `bson:"suspended,omitempty"`
+    Users map[string]int  `bson:users,omitempty`
     TimeCreated time.Time `bson:"timeCreated,omitempty"`
-    Id    bson.ObjectId `bson:"_id,omitempty"`
+    Id    bson.ObjectId   `bson:"_id,omitempty"`
 }
 
 type Admin_t struct {

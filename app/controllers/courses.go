@@ -56,7 +56,6 @@ func (c Courses) Course(CourseIdHex string) revel.Result {
 
     // start with initialise response interface
     data := make(map[string]interface{})
-    //data["error"] = result
     data["error"] = result
     switch result {
         case 0 :
