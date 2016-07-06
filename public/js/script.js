@@ -137,8 +137,26 @@ app
 		getUser: function(){
 			return user;
 		},
-		checkLogin: function(){
-			return null;
+		checkLogin: function(callback){
+			$http.get(API_URL + '/user/loginInfo', {
+				withCredentials: true,
+			}).then(function successCallback(response) {
+				if(response.data.error == 0){
+					user.loggedIn = true;
+					user.name = response.data.data.name;
+					user.email = response.data.data.email;
+					globScope.login = true;
+				}else{
+					user.loggedIn = false;
+					user.name = "";
+					user.email = "";
+					globScope.login = false;
+				}
+				if(callback) callback(response.data);
+			}, function errorCallback(response) {
+				console.log("error");
+				if(callback) callback(response.data);
+			});
 		},
 		logout: function(callback){
 			$http.get(API_URL + '/user/logout', {
