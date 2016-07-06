@@ -43,8 +43,6 @@ func (c Admins) IsAdmin() revel.Result {
             data["message"] = "User is not admin"
         case 3 :
             data["message"] = "Invalid User ID"
-        case 4 :
-            data["message"] = "Unexpected Error in Database"
     }
     return c.RenderJson(data)
 }

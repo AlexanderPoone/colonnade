@@ -179,8 +179,7 @@ func CheckAdmin(s *mgo.Session, UserIdHex string) int {
 
     var result Admin_t
     err := adminsCollection(s).Find(bson.M{"uid": UserId}).One(&result)
-    if err != nil { return 4 }
+    if err != nil { return 2 }
 
-    if result.UserId != UserId { return 2 }
     return 0
 }
