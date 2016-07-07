@@ -19,10 +19,10 @@ type Users struct {
 }
 
 type RegisterProfile struct {
-    Username string `json:"username"`
-    Password string `json:"password"`
-    Email string `json:"email"`
-    Name string `json:"name"`
+    Username string  `json:"username"`
+    Password string  `json:"password"`
+    Email    string  `json:"email"`
+    Name     string  `json:"name"`
 }
 
 func (c Users) Register() revel.Result {

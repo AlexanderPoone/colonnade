@@ -41,7 +41,8 @@ type Course_db struct {
 }
 
 type Course_t struct {
-
+    Name         string  `json:"name"`
+    Description  string  `json:"description"`
 }
 
 type Admin_t struct {
@@ -221,6 +222,21 @@ func AdminCourses(s *mgo.Session, user User_t, admin string) (int, []Course_db) 
     return 0, result
 }
 
-/*func AdminNewCourse(s *mgo.Session, email, username, uname, UserIdHex, admin string) {
-    
-}*/
+func AdminNewCourse(s *mgo.Session, user User_t, admin string, course Course_t) (int, string) {
+    if IsAdmin(user, admin) != 0 { return 1, "" }
+
+    id := bson.NewObjectId()
+    newCourse := Course_db{
+        Name        : course.Name,
+        Description : course.Description,
+        Suspended   : false,
+        Users       : map[string]int{},
+        TimeCreated : time.Now(),
+        Id          : id,
+    }
+
+    err := coursesCollection(s).Insert(newCourse)
+    if err != nil { return 2, "" }
+
+    return 0, id.Hex()
+}

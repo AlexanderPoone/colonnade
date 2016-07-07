@@ -2,8 +2,8 @@ package controllers
 
 import (
     "github.com/revel/revel"
-    //"encoding/json"
-    //"io/ioutil"
+    "encoding/json"
+    "io/ioutil"
     "github.com/janekolszak/revmgo"
     "github.com/ip4368/colonnade/app/models"
 )
@@ -99,8 +99,16 @@ func (c Admins) Courses() revel.Result {
     return c.RenderJson(data)
 }
 
-/*func (c Admins) NewCourse() revel.Result {
-    result, courses := models.AdminCourses(
+func (c Admins) NewCourse() revel.Result {
+    // read request body to byte
+    var course models.Course_t
+    var bodyBytes []byte
+    if c.Request.Body != nil {
+        bodyBytes, _ = ioutil.ReadAll(c.Request.Body)
+    }
+    json.Unmarshal([]byte(bodyBytes), &course)
+
+    result, idHex := models.AdminNewCourse(
         c.MongoSession,
         models.User_t{
             Email: c.Session["email"],
@@ -109,5 +117,20 @@ func (c Admins) Courses() revel.Result {
             UserIdHex: c.Session["userId"],
         },
         c.Session["admin"],
-    )
-}*/
+        course)
+
+    // start with initialise response interface
+    data := make(map[string]interface{})
+    data["error"] = result
+    switch result {
+        case 0 :
+            data["message"] = "Course has been created"
+            data["data"] = new(map[string]interface{})
+            data["data"].(map[string]interface{})["courseId"] = idHex
+        case 1 :
+            data["message"] = "User is not admin"
+        case 2 :
+            data["message"] = "Unexpected Error in Database"
+    }
+    return c.RenderJson(data)
+}
