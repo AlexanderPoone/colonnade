@@ -69,10 +69,7 @@ func (c Admins) IsAdmin() revel.Result {
     return c.RenderJson(data)
 }
 
-func (c Admins) Courses() revel.Result {
-    var courseIdHex struct {Id string `json:"Id,omitempty"`}
-    models.ParseBody(c.Request.Body, &courseIdHex)
-
+func (c Admins) Courses(p int) revel.Result {
     result, courses := models.AdminCourses(
         c.MongoSession,
         models.User_t{
@@ -82,7 +79,7 @@ func (c Admins) Courses() revel.Result {
             UserIdHex: c.Session["userId"],
         },
         c.Session["admin"],
-        courseIdHex.Id,
+        p,
     )
 
     // start with initialise response interface
