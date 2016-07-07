@@ -91,7 +91,8 @@ app
 		$scope.page = "main";
 	}else if($routeParams.Type=="courses"){
 		$scope.page = "listCourses";
-		admin.getAllCourses(function(response){
+		var page = $routeParams.p ? $routeParams.p : 0 ;
+		admin.getAllCourses(page, function(response){
 			$scope.courses = response.data.data;
 			for(var i in $scope.courses){
 				var tempDate = new Date($scope.courses[i].TimeCreated);
@@ -237,8 +238,9 @@ app
 })
 .factory('admin', function($http, login){
 	return {
-		getAllCourses: function(callback){
+		getAllCourses: function(p, callback){
 			$http.get(API_URL + "/admin/courses", {
+				params: {p: p},
 				withCredentials: true,
 			}).then(function successCallback(response){
 				if(response.data.error == 0) callback(response.data);
