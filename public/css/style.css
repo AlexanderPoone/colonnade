@@ -62,7 +62,6 @@ html, body {
 }
 
 .fullheight {
-    height: calc(100% - 42px) !important;
     min-height: calc(100% - 42px) !important;
 }
 
