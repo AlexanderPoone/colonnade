@@ -192,3 +192,17 @@ func IsAdmin(email, username, name, UserIdHex, admin string) int {
     if admin != "t" {return 2}
     return 0
 }
+
+func AdminCourses(s *mgo.Session, email, username, name, UserIdHex, admin string) (int, []Course_t) {
+    if IsAdmin(email, username, name, UserIdHex, admin) != 0 { return 1, []Course_t{} }
+
+    var result []Course_t
+    err := coursesCollection(s).Find(bson.M{}).Select(bson.M{
+        "description": 1,
+        "users": 1,
+        "_id": 1,
+    }).All(&result)
+
+    if err != nil { return 2, []Course_t{} }
+    return 0, result
+}

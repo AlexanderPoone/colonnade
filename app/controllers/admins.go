@@ -67,6 +67,28 @@ func (c Admins) IsAdmin() revel.Result {
     return c.RenderJson(data)
 }
 
-/*func (c Admins) Courses() revel.Result {
-	
-}*/
+func (c Admins) Courses() revel.Result {
+	result, courses := models.AdminCourses(
+		c.MongoSession,
+		c.Session["email"],
+		c.Session["username"],
+		c.Session["name"],
+		c.Session["userId"],
+		c.Session["admin"],
+	)
+
+	// start with initialise response interface
+    data := make(map[string]interface{})
+    data["error"] = result
+    switch result {
+        case 0 :
+            data["message"] = "Success"
+            data["data"] = make(map[string]interface{})
+            data["data"].(map[string]interface{})["data"] = courses
+        case 1 :
+            data["message"] = "User is not admin"
+        case 2 :
+            data["message"] = "Unexpected Error in Database"
+    }
+    return c.RenderJson(data)
+}

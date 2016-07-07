@@ -26,6 +26,7 @@ GET		/api/course/:Id                         Courses.Course()
 # Admin(s) endpoint
 GET		/api/admin/checkAdmin                   Admins.CheckAdmin()
 GET		/api/admin/isAdmin                      Admins.IsAdmin()
+GET		/api/admin/courses                      Admins.Courses()
 
 # Catch all
 #*      /:controller/:action                    :controller.:action
