@@ -18,29 +18,35 @@ const TUTORS = 1
 const STUDENTS = 2
 
 type User_db struct {
-    Identifier [2]string `bson:"identifier"`
-    Passwd string        `bson:"passwd"`
-    Salt string          `bson:"salt"`
-    PrevPasswd []string  `bson:"prevpasswd,omitempty"`
-    Suspended bool       `bson:"suspended"`
-    Name string          `bson:"name"`
-    Id    bson.ObjectId  `bson:"_id,omitempty"`
+    Identifier  [2]string      `bson:"identifier"`
+    Passwd      string         `bson:"passwd"`
+    Salt        string         `bson:"salt"`
+    PrevPasswd  []string       `bson:"prevpasswd,omitempty"`
+    Suspended   bool           `bson:"suspended"`
+    Name        string         `bson:"name"`
+    Id          bson.ObjectId  `bson:"_id,omitempty"`
 }
 
 type User_t struct {
-    Email string
-    Username string
-    Name string
-    UserIdHex string
+    Email      string
+    Username   string
+    Name       string
+    UserIdHex  string
+}
+
+type UserInCourse struct {
+    Id    bson.ObjectId  `bson:"uid"`
+    Name  string         `bson:"name"`
+    Role  int            `bson:"role"`
 }
 
 type Course_db struct {
-    Name string           `bson:"name"`
-    Description string    `bson:"description"`
-    Suspended bool        `bson:"suspended,omitempty"`
-    Users map[string]int  `bson:"users,omitempty"`
-    TimeCreated time.Time `bson:"timeCreated,omitempty"`
-    Id    bson.ObjectId   `bson:"_id,omitempty"`
+    Name string                 `bson:"name"`
+    Description string          `bson:"description"`
+    Suspended   bool            `bson:"suspended,omitempty"`
+    Users       []UserInCourse  `bson:"users,omitempty"`
+    TimeCreated time.Time       `bson:"timeCreated,omitempty"`
+    Id          bson.ObjectId   `bson:"_id,omitempty"`
 }
 
 type Course_t struct {
@@ -172,25 +178,24 @@ func CoursesForUser(s *mgo.Session, UserIdHex string) (int, []Course_db, []Cours
     isValidId := bson.IsObjectIdHex(UserIdHex)
     if !isValidId { return 2, []Course_db{}, []Course_db{}, []Course_db{} }
     UserId := bson.ObjectIdHex(UserIdHex)
-    UserIdStr := UserId.String()
 
     var result []Course_db
     err := coursesCollection(s).Find(bson.M{
         "$and": []bson.M{
-            bson.M{UserIdStr: bson.M{"$exists": true}},
-            bson.M{"suspended": true},
+            bson.M{"users.uid": UserId},
+            bson.M{"suspended": false},
         },
     }).Select(bson.M{
         "name": 1,
         "description": 1,
-        "users": 1,
+        "users": bson.M{"$elemMatch":bson.M{"$eq":UserId}},
         "_id": 1,
     }).All(&result)
     if err != nil { return 3, []Course_db{}, []Course_db{}, []Course_db{} }
 
     var groups [3][]Course_db
     for _, value := range result {
-        groups[value.Users[UserIdStr]] = append(groups[value.Users[UserIdStr]], Course_db{
+        groups[value.Users[0].Role] = append(groups[value.Users[0].Role], Course_db{
                 Name: value.Name,
                 Description: value.Description,
                 Id: value.Id,
@@ -244,7 +249,7 @@ func AdminNewCourse(s *mgo.Session, user User_t, admin string, course Course_t) 
         Name        : course.Name,
         Description : course.Description,
         Suspended   : false,
-        Users       : map[string]int{},
+        Users       : []UserInCourse{},
         TimeCreated : time.Now(),
         Id          : id,
     }
