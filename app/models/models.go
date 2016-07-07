@@ -14,7 +14,7 @@ const COODRINATORS = 0
 const TUTORS = 1
 const STUDENTS = 2
 
-type User_t struct {
+type User_db struct {
     Identifier [2]string `bson:"identifier"`
     Passwd string        `bson:"passwd"`
     Salt string          `bson:"salt"`
@@ -24,13 +24,24 @@ type User_t struct {
     Id    bson.ObjectId  `bson:"_id,omitempty"`
 }
 
-type Course_t struct {
+type User_t struct {
+    Email string
+    Username string
+    Name string
+    UserIdHex string
+}
+
+type Course_db struct {
     Name string           `bson:"name"`
     Description string    `bson:"description"`
     Suspended bool        `bson:"suspended,omitempty"`
     Users map[string]int  `bson:"users,omitempty"`
     TimeCreated time.Time `bson:"timeCreated,omitempty"`
     Id    bson.ObjectId   `bson:"_id,omitempty"`
+}
+
+type Course_t struct {
+
 }
 
 type Admin_t struct {
@@ -96,7 +107,7 @@ func RegisterHandler(s *mgo.Session, email, username, passwd, name string) int {
     if !userprofile.ValidateName(name) { return 4 }
 
     hashed, salt, _ := password.HashAutoSalt(passwd)
-    doc := User_t{
+    doc := User_db{
         Identifier: [2]string{email, username},
         Passwd: hashed,
         Salt: salt,
@@ -117,7 +128,7 @@ func LoginHandler(s *mgo.Session, email, passwd string) (int, [2]string, string,
     if !userprofile.ValidateEmail(email) { return 1, [2]string{"", ""}, "", "" }
     if !password.ValidatePassword(passwd) { return 1, [2]string{"", ""}, "", "" }
 
-    u := new(User_t)
+    u := new(User_db)
 
     usersCollection(s).Find(bson.M{
         "identifier": email,
@@ -133,22 +144,25 @@ func LoginHandler(s *mgo.Session, email, passwd string) (int, [2]string, string,
     return 0, u.Identifier, u.Id.Hex(), u.Name
 }
 
-func LoginStatus(email, username, name, userId string) int {
-    if(email == "" && username == "" && name == "" && userId == "") { return 1 }
+func LoginStatus(user User_t) int {
+    if(user.Email == "" && 
+       user.Username == "" &&
+       user.Name == "" &&
+       user.UserIdHex == "") { return 1 }
     return 0;
 }
 
-func LogoutHandler(email, username, name, userId string) int {
-    return LoginStatus(email, username, name, userId)
+func LogoutHandler(user User_t) int {
+    return LoginStatus(user)
 }
 
-func CoursesForUser(s *mgo.Session, UserIdHex string) (int, []Course_t, []Course_t, []Course_t) {
+func CoursesForUser(s *mgo.Session, UserIdHex string) (int, []Course_db, []Course_db, []Course_db) {
     isValidId := bson.IsObjectIdHex(UserIdHex)
-    if !isValidId { return 2, []Course_t{}, []Course_t{}, []Course_t{} }
+    if !isValidId { return 2, []Course_db{}, []Course_db{}, []Course_db{} }
     UserId := bson.ObjectIdHex(UserIdHex)
     UserIdStr := UserId.String()
 
-    var result []Course_t
+    var result []Course_db
     err := coursesCollection(s).Find(bson.M{
         "$and": []bson.M{
             bson.M{UserIdStr: bson.M{"$exists": true}},
@@ -160,11 +174,11 @@ func CoursesForUser(s *mgo.Session, UserIdHex string) (int, []Course_t, []Course
         "users": 1,
         "_id": 1,
     }).All(&result)
-    if err != nil { return 3, []Course_t{}, []Course_t{}, []Course_t{} }
+    if err != nil { return 3, []Course_db{}, []Course_db{}, []Course_db{} }
 
-    var groups [3][]Course_t
+    var groups [3][]Course_db
     for _, value := range result {
-        groups[value.Users[UserIdStr]] = append(groups[value.Users[UserIdStr]], Course_t{
+        groups[value.Users[UserIdStr]] = append(groups[value.Users[UserIdStr]], Course_db{
                 Name: value.Name,
                 Description: value.Description,
                 Id: value.Id,
@@ -174,11 +188,11 @@ func CoursesForUser(s *mgo.Session, UserIdHex string) (int, []Course_t, []Course
     return 0, groups[COODRINATORS], groups[TUTORS], groups[STUDENTS]
 }
 
-func CheckAdmin(s *mgo.Session, email, username, name, UserIdHex string) int {
-    if LoginStatus(email, username, name, UserIdHex) != 0 { return 1 }
-    isValidId := bson.IsObjectIdHex(UserIdHex)
+func CheckAdmin(s *mgo.Session, user User_t) int {
+    if LoginStatus(user) != 0 { return 1 }
+    isValidId := bson.IsObjectIdHex(user.UserIdHex)
     if !isValidId { return 3 }
-    UserId := bson.ObjectIdHex(UserIdHex)
+    UserId := bson.ObjectIdHex(user.UserIdHex)
 
     var result Admin_t
     err := adminsCollection(s).Find(bson.M{"uid": UserId}).One(&result)
@@ -187,22 +201,26 @@ func CheckAdmin(s *mgo.Session, email, username, name, UserIdHex string) int {
     return 0
 }
 
-func IsAdmin(email, username, name, UserIdHex, admin string) int {
-    if LoginStatus(email, username, name, UserIdHex) != 0 { return 1 }
+func IsAdmin(user User_t, admin string) int {
+    if LoginStatus(user) != 0 { return 1 }
     if admin != "t" {return 2}
     return 0
 }
 
-func AdminCourses(s *mgo.Session, email, username, name, UserIdHex, admin string) (int, []Course_t) {
-    if IsAdmin(email, username, name, UserIdHex, admin) != 0 { return 1, []Course_t{} }
+func AdminCourses(s *mgo.Session, user User_t, admin string) (int, []Course_db) {
+    if IsAdmin(user, admin) != 0 { return 1, []Course_db{} }
 
-    var result []Course_t
+    var result []Course_db
     err := coursesCollection(s).Find(bson.M{}).Select(bson.M{
         "description": 1,
         "users": 1,
         "_id": 1,
     }).All(&result)
 
-    if err != nil { return 2, []Course_t{} }
+    if err != nil { return 2, []Course_db{} }
     return 0, result
 }
+
+/*func AdminNewCourse(s *mgo.Session, email, username, uname, UserIdHex, admin string) {
+    
+}*/

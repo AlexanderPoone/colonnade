@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/revel/revel"
+    "github.com/revel/revel"
     //"encoding/json"
     //"io/ioutil"
     "github.com/janekolszak/revmgo"
@@ -20,12 +20,14 @@ type Admins struct {
 
 func (c Admins) CheckAdmin() revel.Result {
     result := models.CheckAdmin(
-		c.MongoSession,
-		c.Session["email"],
-        c.Session["username"],
-        c.Session["name"],
-        c.Session["userId"],
-	)
+        c.MongoSession,
+        models.User_t{
+            Email: c.Session["email"],
+            Username: c.Session["username"],
+            Name: c.Session["name"],
+            UserIdHex: c.Session["userId"],
+        },
+    )
 
     // start with initialise response interface
     data := make(map[string]interface{})
@@ -45,15 +47,17 @@ func (c Admins) CheckAdmin() revel.Result {
 }
 
 func (c Admins) IsAdmin() revel.Result {
-	result := models.IsAdmin(
-		c.Session["email"],
-        c.Session["username"],
-        c.Session["name"],
-        c.Session["userId"],
-		c.Session["admin"],
-	)
+    result := models.IsAdmin(
+        models.User_t{
+            Email: c.Session["email"],
+            Username: c.Session["username"],
+            Name: c.Session["name"],
+            UserIdHex: c.Session["userId"],
+        },
+        c.Session["admin"],
+    )
 
-	// start with initialise response interface
+    // start with initialise response interface
     data := make(map[string]interface{})
     data["error"] = result
     switch result {
@@ -68,16 +72,18 @@ func (c Admins) IsAdmin() revel.Result {
 }
 
 func (c Admins) Courses() revel.Result {
-	result, courses := models.AdminCourses(
-		c.MongoSession,
-		c.Session["email"],
-		c.Session["username"],
-		c.Session["name"],
-		c.Session["userId"],
-		c.Session["admin"],
-	)
+    result, courses := models.AdminCourses(
+        c.MongoSession,
+        models.User_t{
+            Email: c.Session["email"],
+            Username: c.Session["username"],
+            Name: c.Session["name"],
+            UserIdHex: c.Session["userId"],
+        },
+        c.Session["admin"],
+    )
 
-	// start with initialise response interface
+    // start with initialise response interface
     data := make(map[string]interface{})
     data["error"] = result
     switch result {
@@ -92,3 +98,16 @@ func (c Admins) Courses() revel.Result {
     }
     return c.RenderJson(data)
 }
+
+/*func (c Admins) NewCourse() revel.Result {
+    result, courses := models.AdminCourses(
+        c.MongoSession,
+        models.User_t{
+            Email: c.Session["email"],
+            Username: c.Session["username"],
+            Name: c.Session["name"],
+            UserIdHex: c.Session["userId"],
+        },
+        c.Session["admin"],
+    )
+}*/

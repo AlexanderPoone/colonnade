@@ -68,11 +68,12 @@ func (c Users) Login() revel.Result {
     result, identifier, id, name := models.LoginHandler(c.MongoSession, r.Email, r.Password)
     admin := models.CheckAdmin(
         c.MongoSession,
-        identifier[0],
-        identifier[1],
-        name,
-        id,
-    )
+        models.User_t{
+            Email: identifier[0],
+            Username: identifier[1],
+            Name: name,
+            UserIdHex: id,
+        })
 
     // start with initialise response interface
     data := make(map[string]interface{})
@@ -104,11 +105,12 @@ func (c Users) Login() revel.Result {
 
 func (c Users) Logout() revel.Result {
     result := models.LogoutHandler(
-        c.Session["email"],
-        c.Session["username"],
-        c.Session["name"],
-        c.Session["userId"],
-    )
+        models.User_t{
+            Email: c.Session["email"],
+            Username: c.Session["username"],
+            Name: c.Session["name"],
+            UserIdHex: c.Session["userId"],
+        })
 
     // start with initialise response interface
     data := make(map[string]interface{})
@@ -129,11 +131,12 @@ func (c Users) Logout() revel.Result {
 
 func (c Users) LoginInfo() revel.Result {
     result := models.LoginStatus(
-        c.Session["email"],
-        c.Session["username"],
-        c.Session["name"],
-        c.Session["userId"],
-    )
+        models.User_t{
+            Email: c.Session["email"],
+            Username: c.Session["username"],
+            Name: c.Session["name"],
+            UserIdHex: c.Session["userId"],
+        })
 
     data := make(map[string]interface{})
     data["error"] = result
