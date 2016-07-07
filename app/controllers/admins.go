@@ -131,3 +131,41 @@ func (c Admins) NewCourse() revel.Result {
     }
     return c.RenderJson(data)
 }
+
+func (c Admins) AddUsers2Course(CourseIdHex string) revel.Result {
+    var users struct{
+        Users  []models.UserInCourse_t  `json:"users"`
+    }
+    models.ParseBody(c.Request.Body, &users)
+
+    status, usersStatus := models.AdminAddUser2Course(
+        c.MongoSession,
+        models.User_t{
+            Email: c.Session["email"],
+            Username: c.Session["username"],
+            Name: c.Session["name"],
+            UserIdHex: c.Session["userId"],
+        },
+        c.Session["admin"],
+        CourseIdHex,
+        users.Users)
+
+    // start with initialise response interface
+    data := make(map[string]interface{})
+    data["error"] = status
+    switch status {
+        case 0 :
+            data["message"] = "All/Part of the users have been added"
+            data["data"] = make(map[string]interface{})
+            data["data"].(map[string]interface{})["userStatus"] = usersStatus
+        case 1 :
+            data["message"] = "User is not admin"
+        case 2 :
+            data["message"] = "Course id is invalid"
+        case 3 :
+            data["message"] = "No valid users can be added"
+        case 4 :
+            data["message"] = "Unexpected Error in Database"
+    }
+    return c.RenderJson(data)
+}

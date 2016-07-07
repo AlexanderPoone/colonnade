@@ -34,19 +34,23 @@ type User_t struct {
     UserIdHex  string
 }
 
-type UserInCourse struct {
+type UserInCourse_db struct {
     Id    bson.ObjectId  `bson:"uid"`
-    Name  string         `bson:"name"`
     Role  int            `bson:"role"`
 }
 
+type UserInCourse_t struct {
+    IdHex    string      `json:"uid"`
+    Role     int         `json:"role"`
+}
+
 type Course_db struct {
-    Name string                 `bson:"name"`
-    Description string          `bson:"description"`
-    Suspended   bool            `bson:"suspended,omitempty"`
-    Users       []UserInCourse  `bson:"users,omitempty"`
-    TimeCreated time.Time       `bson:"timeCreated,omitempty"`
-    Id          bson.ObjectId   `bson:"_id,omitempty"`
+    Name string                    `bson:"name"`
+    Description string             `bson:"description"`
+    Suspended   bool               `bson:"suspended,omitempty"`
+    Users       []UserInCourse_db  `bson:"users,omitempty"`
+    TimeCreated time.Time          `bson:"timeCreated,omitempty"`
+    Id          bson.ObjectId      `bson:"_id,omitempty"`
 }
 
 type Course_t struct {
@@ -249,7 +253,7 @@ func AdminNewCourse(s *mgo.Session, user User_t, admin string, course Course_t) 
         Name        : course.Name,
         Description : course.Description,
         Suspended   : false,
-        Users       : []UserInCourse{},
+        Users       : []UserInCourse_db{},
         TimeCreated : time.Now(),
         Id          : id,
     }
@@ -258,4 +262,43 @@ func AdminNewCourse(s *mgo.Session, user User_t, admin string, course Course_t) 
     if err != nil { return 2, "" }
 
     return 0, id.Hex()
+}
+
+func AddUser2Course(s *mgo.Session, courseId bson.ObjectId, u []UserInCourse_db) int {
+    err := coursesCollection(s).Update(
+        bson.M{"_id": courseId},
+        bson.M{"$addToSet": bson.M{"users": bson.M{"$each": u}}},
+    )
+    if err != nil { return 1 }
+    return 0
+}
+
+func AdminAddUser2Course(s *mgo.Session,
+        user User_t,
+        admin string,
+        courseIdHex string,
+        c []UserInCourse_t) (int, []int) {
+    if IsAdmin(user, admin) != 0 { return 1, []int{} }
+
+    if !bson.IsObjectIdHex(courseIdHex) { return 2, []int{} }
+    courseId := bson.ObjectIdHex(courseIdHex)
+
+    var successUsers []int
+    var users []UserInCourse_db
+    for _, value := range c {
+        if bson.IsObjectIdHex(value.IdHex) && value.Role >= COODRINATORS && value.Role <= STUDENTS {
+            successUsers = append(successUsers, 0)
+            users = append(users, UserInCourse_db{
+                Id:   bson.ObjectIdHex(value.IdHex),
+                Role: value.Role,
+            })
+        }else{
+            successUsers = append(successUsers, 1)
+        }
+    }
+
+    if len(users) == 0 { return 3, []int{} }
+    result := AddUser2Course(s, courseId, users)
+    if result != 0 { return 4, []int{} }
+    return 0, successUsers
 }
