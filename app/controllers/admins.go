@@ -2,8 +2,6 @@ package controllers
 
 import (
     "github.com/revel/revel"
-    "encoding/json"
-    "io/ioutil"
     "github.com/janekolszak/revmgo"
     "github.com/ip4368/colonnade/app/models"
 )
@@ -102,11 +100,7 @@ func (c Admins) Courses() revel.Result {
 func (c Admins) NewCourse() revel.Result {
     // read request body to byte
     var course models.Course_t
-    var bodyBytes []byte
-    if c.Request.Body != nil {
-        bodyBytes, _ = ioutil.ReadAll(c.Request.Body)
-    }
-    json.Unmarshal([]byte(bodyBytes), &course)
+    models.ParseBody(c.Request.Body, &course)
 
     result, idHex := models.AdminNewCourse(
         c.MongoSession,

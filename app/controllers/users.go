@@ -2,8 +2,6 @@ package controllers
 
 import (
     "github.com/revel/revel"
-    "encoding/json"
-    "io/ioutil"
     "github.com/janekolszak/revmgo"
     "github.com/ip4368/colonnade/app/models"
 )
@@ -28,11 +26,7 @@ type RegisterProfile struct {
 func (c Users) Register() revel.Result {
     // read request body to byte
     var r RegisterProfile
-    var bodyBytes []byte
-    if c.Request.Body != nil {
-        bodyBytes, _ = ioutil.ReadAll(c.Request.Body)
-    }
-    json.Unmarshal([]byte(bodyBytes), &r)
+    models.ParseBody(c.Request.Body, &r)
 
     result := models.RegisterHandler(c.MongoSession, r.Email, r.Username, r.Password, r.Name)
 
@@ -59,11 +53,7 @@ func (c Users) Register() revel.Result {
 func (c Users) Login() revel.Result {
     // read request body to byte
     var r RegisterProfile
-    var bodyBytes []byte
-    if c.Request.Body != nil {
-        bodyBytes, _ = ioutil.ReadAll(c.Request.Body)
-    }
-    json.Unmarshal([]byte(bodyBytes), &r)
+    models.ParseBody(c.Request.Body, &r)
 
     result, identifier, id, name := models.LoginHandler(c.MongoSession, r.Email, r.Password)
     admin := models.CheckAdmin(

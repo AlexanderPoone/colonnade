@@ -1,6 +1,9 @@
 package models
 
 import (
+    "encoding/json"
+    "io"
+    "io/ioutil"
     "gopkg.in/mgo.v2"
     "gopkg.in/mgo.v2/bson"
     "github.com/revel/revel"
@@ -86,6 +89,14 @@ func GuardAdmins() {
         users.EnsureIndex(index)
         localDBSession.Close()
     }
+}
+
+func ParseBody(body io.Reader, r interface{}) {
+    var bodyBytes []byte
+    if body != nil {
+        bodyBytes, _ = ioutil.ReadAll(body)
+    }
+    json.Unmarshal([]byte(bodyBytes), &r)
 }
 
 func usersCollection(s *mgo.Session) *mgo.Collection {

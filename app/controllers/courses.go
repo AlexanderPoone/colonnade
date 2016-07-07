@@ -2,8 +2,6 @@ package controllers
 
 import (
     "github.com/revel/revel"
-    //"encoding/json"
-    //"io/ioutil"
     "github.com/janekolszak/revmgo"
     "github.com/ip4368/colonnade/app/models"
 )
