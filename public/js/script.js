@@ -19,7 +19,7 @@ app
 	.when('/login/',{
 		templateUrl:'public/template/login.html',
 		controller:'loginCtrl'})
-	.when('/admin/:type?/:id?',{
+	.when('/admin/:Type?/:Id?',{
 		templateUrl:'public/template/admin.html',
 		controller:'adminCtrl'})
 	.otherwise({
@@ -87,10 +87,55 @@ app
 	};
 })
 .controller("adminCtrl", function($scope, $routeParams, login, admin){
-	if($routeParams.type=="courses"){
+	if($routeParams.Type===undefined){
+		$scope.page = "main";
+	}else if($routeParams.Type=="courses"){
+		$scope.page = "listCourses";
 		admin.getAllCourses(function(response){
-			$scope.courses = response.data;
+			$scope.courses = response.data.data;
+			for(var i in $scope.courses){
+				var tempDate = new Date($scope.courses[i].TimeCreated);
+				$scope.courses[i].newDate = tempDate.toLocaleDateString();
+			}
 		})
+	}else if($routeParams.Type="course"){
+		if($routeParams.Id === "new"){
+			$scope.page = "newCourse";
+			$scope.step = {};
+			$scope.step.style = {};
+			$scope.step.style.info = {
+				'active': true,
+			};
+			$scope.step.style.staff = {
+				'active': false,
+				'disabled': true,
+			};
+			$scope.step.style.done = {
+				'active': false,
+				'disabled': true,
+			};
+			$scope.step.current = 'info';
+			$scope.step.handler = [];
+			$scope.step.handler.push(function(){
+				$scope.step.style.form0 = {'loading': true };
+				admin.createNewCourse(
+					$scope.step.data.name,
+					$scope.step.data.description,
+					function(response){
+						if(response.error == 0){
+							$scope.step.style.form0 = {'loading': false };
+							$scope.step.current = 'staff';
+							$scope.step.style.info = {
+								'active': false,
+							};
+							$scope.step.style.staff = {
+								'active': true,
+								'disabled': false,
+							};
+						}
+					});
+			});
+		}
 	}
 })
 .controller("404Ctrl", function($scope, $http, login){
@@ -202,7 +247,7 @@ app
 				if(callback) callback(response.data);
 			});
 		},
-		createNewCourse: function(name, description){
+		createNewCourse: function(name, description, callback){
 			$http.post(API_URL + "/admin/course/new", {
 				name: name,
 				description: description,

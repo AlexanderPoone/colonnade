@@ -82,6 +82,10 @@ html, body {
     color: #9F3A38 !important;
 }
 
+.content-wrapper {
+    padding-top: 30px;
+}
+
 .msg404 {
     text-align: center;
     top: 50%;
@@ -91,14 +95,11 @@ html, body {
 
 @media only screen and (min-width: 768px) {
     .login-wrapper {
-        min-height: 100% !important;
-        height: 100% !important;
         margin: 0 !important;
     }
 
     .login-center {
-        top: 50%;
-        transform: translateY(-50%);
+        top: 50px;
         position: relative !important;
         height: 300px;
     }
