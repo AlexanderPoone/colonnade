@@ -19,16 +19,16 @@ type Courses struct {
 
 func (c Courses) CoursesForUser() revel.Result {
     loginStat := models.LoginStatus(
-    	models.User_t{
-    		Email: c.Session["email"],
-    		Username: c.Session["username"],
-    		Name: c.Session["name"],
-    		UserIdHex: c.Session["userId"],
-    	})
+        models.User_t{
+            Email: c.Session["email"],
+            Username: c.Session["username"],
+            Name: c.Session["name"],
+            UserIdHex: c.Session["userId"],
+        })
     var result int = 0
     var coordinator, tutor, student []models.Course_db
     if loginStat == 0 {
-    	result, coordinator, tutor, student = models.CoursesForUser(c.MongoSession, c.Session["userId"])
+        result, coordinator, tutor, student = models.CoursesForUser(c.MongoSession, c.Session["userId"])
     } else { result = 1 }
 
     // start with initialise response interface
