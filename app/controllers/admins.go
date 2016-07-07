@@ -70,6 +70,9 @@ func (c Admins) IsAdmin() revel.Result {
 }
 
 func (c Admins) Courses() revel.Result {
+    var courseIdHex struct {Id string `json:"Id,omitempty"`}
+    models.ParseBody(c.Request.Body, &courseIdHex)
+
     result, courses := models.AdminCourses(
         c.MongoSession,
         models.User_t{
@@ -79,6 +82,7 @@ func (c Admins) Courses() revel.Result {
             UserIdHex: c.Session["userId"],
         },
         c.Session["admin"],
+        courseIdHex.Id,
     )
 
     // start with initialise response interface
@@ -92,6 +96,8 @@ func (c Admins) Courses() revel.Result {
         case 1 :
             data["message"] = "User is not admin"
         case 2 :
+            data["message"] = "Course Id is not valid"
+        case 3 :
             data["message"] = "Unexpected Error in Database"
     }
     return c.RenderJson(data)

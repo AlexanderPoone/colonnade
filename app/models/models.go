@@ -219,18 +219,28 @@ func IsAdmin(user User_t, admin string) int {
     return 0
 }
 
-func AdminCourses(s *mgo.Session, user User_t, admin string) (int, []Course_db) {
+func AdminCourses(s *mgo.Session, user User_t, admin, courseIdHex string) (int, []Course_db) {
     if IsAdmin(user, admin) != 0 { return 1, []Course_db{} }
 
+    var query = bson.M{}
+    if courseIdHex != "" {
+        if !bson.IsObjectIdHex(courseIdHex) { return 2, []Course_db{} }
+        courseId := bson.ObjectIdHex(courseIdHex)
+        query = bson.M{"_id": bson.M{"$gte": courseId}}
+    }
+
     var result []Course_db
-    err := coursesCollection(s).Find(bson.M{}).Select(bson.M{
+    var limit = 20
+    if courseIdHex != "" { limit = 21 }
+    err := coursesCollection(s).Find(query).Select(bson.M{
         "description": 1,
         "name": 1,
         "timeCreated": 1,
         "_id": 1,
-    }).All(&result)
+    }).Limit(limit).All(&result)
+    if courseIdHex != "" { result = result[1:] }
 
-    if err != nil { return 2, []Course_db{} }
+    if err != nil { return 3, []Course_db{} }
     return 0, result
 }
 
