@@ -225,7 +225,8 @@ func AdminCourses(s *mgo.Session, user User_t, admin string) (int, []Course_db) 
     var result []Course_db
     err := coursesCollection(s).Find(bson.M{}).Select(bson.M{
         "description": 1,
-        "users": 1,
+        "name": 1,
+        "timeCreated": 1,
         "_id": 1,
     }).All(&result)
 
