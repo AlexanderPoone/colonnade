@@ -119,7 +119,7 @@ func (c Admins) NewCourse() revel.Result {
     switch result {
         case 0 :
             data["message"] = "Course has been created"
-            data["data"] = new(map[string]interface{})
+            data["data"] = make(map[string]interface{})
             data["data"].(map[string]interface{})["courseId"] = idHex
         case 1 :
             data["message"] = "User is not admin"
