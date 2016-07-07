@@ -174,7 +174,8 @@ func CoursesForUser(s *mgo.Session, UserIdHex string) (int, []Course_t, []Course
     return 0, groups[COODRINATORS], groups[TUTORS], groups[STUDENTS]
 }
 
-func CheckAdmin(s *mgo.Session, UserIdHex string) int {
+func CheckAdmin(s *mgo.Session, email, username, name, UserIdHex string) int {
+    if LoginStatus(email, username, name, UserIdHex) != 0 { return 1 }
     isValidId := bson.IsObjectIdHex(UserIdHex)
     if !isValidId { return 3 }
     UserId := bson.ObjectIdHex(UserIdHex)
@@ -183,5 +184,11 @@ func CheckAdmin(s *mgo.Session, UserIdHex string) int {
     err := adminsCollection(s).Find(bson.M{"uid": UserId}).One(&result)
     if err != nil { return 2 }
 
+    return 0
+}
+
+func IsAdmin(email, username, name, UserIdHex, admin string) int {
+    if LoginStatus(email, username, name, UserIdHex) != 0 { return 1 }
+    if admin != "t" {return 2}
     return 0
 }

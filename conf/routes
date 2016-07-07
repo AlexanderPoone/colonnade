@@ -24,6 +24,7 @@ GET		/api/courses                            Courses.CoursesForUser()
 GET		/api/course/:Id                         Courses.Course()
 
 # Admin(s) endpoint
+GET		/api/admin/checkAdmin                   Admins.CheckAdmin()
 GET		/api/admin/isAdmin                      Admins.IsAdmin()
 
 # Catch all

@@ -66,7 +66,13 @@ func (c Users) Login() revel.Result {
     json.Unmarshal([]byte(bodyBytes), &r)
 
     result, identifier, id, name := models.LoginHandler(c.MongoSession, r.Email, r.Password)
-    admin := models.CheckAdmin(c.MongoSession, id)
+    admin := models.CheckAdmin(
+        c.MongoSession,
+        identifier[0],
+        identifier[1],
+        name,
+        id,
+    )
 
     // start with initialise response interface
     data := make(map[string]interface{})
