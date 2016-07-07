@@ -1,6 +1,7 @@
 <div class="content-wrapper">
   <div class="ui stackable container" ng-show="page=='main'">
-    <a href="./#/admin/courses/">Show All Courses</a>
+    <p><a href="./#/admin/courses/">Show All Courses</a></p>
+    <p><a href="./#/admin/course/new/">Create New Courses</a></p>
   </div>
   <div class="ui stackable container" ng-show="page=='listCourses'">
     <table class="ui celled striped table">
@@ -17,8 +18,8 @@
       <tbody>
         <tr ng-repeat="course in courses">
           <td><a ng-href="./#/admin/course/{{course.Id}}" ng-bind="course.Name"></a></td>
-          <td><a ng-href="./#/admin/course/{{course.Id}}" ng-bind="course.Description"></a></td>
-          <td><a ng-href="./#/admin/course/{{course.Id}}" ng-bind="course.newDate"></a></td>
+          <td ng-bind="course.Description"></td>
+          <td ng-bind="course.newDate"></td>
         </tr>
       </tbody>
     </table>
