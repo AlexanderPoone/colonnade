@@ -19,7 +19,7 @@ app
 	.when('/login/',{
 		templateUrl:'public/template/login.html',
 		controller:'loginCtrl'})
-	.when('/admin/',{
+	.when('/admin/:type?/:id?',{
 		templateUrl:'public/template/admin.html',
 		controller:'adminCtrl'})
 	.otherwise({
@@ -86,7 +86,12 @@ app
 		$scope.regInvalid = invalid;
 	};
 })
-.controller("adminCtrl", function($scope, $http, login, admin){
+.controller("adminCtrl", function($scope, $routeParams, login, admin){
+	if($routeParams.type=="courses"){
+		admin.getAllCourses(function(response){
+			$scope.courses = response.data;
+		})
+	}
 })
 .controller("404Ctrl", function($scope, $http, login){
 })
@@ -187,6 +192,18 @@ app
 })
 .factory('admin', function($http, login){
 	return {
+		getAllCourses: function(callback){
+			$http.get(API_URL + "/admin/courses", {
+				withCredentials: true,
+			}).then(function successCallback(response){
+				if(response.data.error == 0) callback(response.data);
+			},function errorCallback(response){
+				console.log("error");
+				if(callback) callback(response.data);
+			});
+		},
+		createNewCourse: function(){
+		},
 	}
 });
 
