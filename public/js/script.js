@@ -202,7 +202,18 @@ app
 				if(callback) callback(response.data);
 			});
 		},
-		createNewCourse: function(){
+		createNewCourse: function(name, description){
+			$http.post(API_URL + "/admin/course/new", {
+				name: name,
+				description: description,
+			}, {
+				withCredentials: true,
+			}).then(function successCallback(response){
+				callback(response.data);
+			}, function errorCallback(response){
+				console.log("error");
+				callback(response.data);
+			})
 		},
 	}
 });
