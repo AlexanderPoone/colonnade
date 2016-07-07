@@ -19,6 +19,9 @@ app
 	.when('/login/',{
 		templateUrl:'public/template/login.html',
 		controller:'loginCtrl'})
+	.when('/admin/',{
+		templateUrl:'public/template/admin.html',
+		controller:'adminCtrl'})
 	.otherwise({
 		templateUrl:'public/template/404.html',
 		controller:'404Ctrl'});
@@ -83,37 +86,44 @@ app
 		$scope.regInvalid = invalid;
 	};
 })
+.controller("adminCtrl", function($scope, $http, login, admin){
+})
 .controller("404Ctrl", function($scope, $http, login){
-
 })
 .factory('login', function($http){
 	var user = {};
 	user.loggedIn = false;
 	user.name = "";
 	user.email = "";
-	globScope = null;
+	user.admin = false;
+	var globScope = null;
+	var checkLogin = function(callback){
+		$http.get(API_URL + '/user/loginInfo', {
+			withCredentials: true,
+		}).then(function successCallback(response) {
+			if(response.data.error == 0){
+				user.loggedIn = true;
+				user.name = response.data.data.name;
+				user.email = response.data.data.email;
+				user.admin = globScope.admin = response.data.data.admin;
+				globScope.login = true;
+			}else{
+				user.loggedIn = false;
+				user.name = "";
+				user.email = "";
+				user.admin = globScope.admin = false;
+				globScope.login = false;
+			}
+			if(callback) callback(response.data);
+		}, function errorCallback(response) {
+			console.log("error");
+			if(callback) callback(response.data);
+		});
+	}
 	return {
 		init: function(scope, callback){
 			globScope = scope;
-			$http.get(API_URL + '/user/loginInfo', {
-				withCredentials: true,
-			}).then(function successCallback(response) {
-				if(response.data.error == 0){
-					user.loggedIn = true;
-					user.name = response.data.data.name;
-					user.email = response.data.data.email;
-					globScope.login = true;
-				}else{
-					user.loggedIn = false;
-					user.name = "";
-					user.email = "";
-					globScope.login = false;
-				}
-				if(callback) callback(response.data);
-			}, function errorCallback(response) {
-				console.log("error");
-				if(callback) callback(response.data);
-			});
+			checkLogin();
 		},
 		launch: function(email, password, callback){
 			$http.post(API_URL + '/user/login', {
@@ -126,6 +136,7 @@ app
 					user.loggedIn = true;
 					user.name = response.data.data.name;
 					user.email = email;
+					user.admin = globScope.admin = response.data.data.admin;
 					globScope.login = true;
 				}
 				if(callback) callback(response.data);
@@ -137,27 +148,7 @@ app
 		getUser: function(){
 			return user;
 		},
-		checkLogin: function(callback){
-			$http.get(API_URL + '/user/loginInfo', {
-				withCredentials: true,
-			}).then(function successCallback(response) {
-				if(response.data.error == 0){
-					user.loggedIn = true;
-					user.name = response.data.data.name;
-					user.email = response.data.data.email;
-					globScope.login = true;
-				}else{
-					user.loggedIn = false;
-					user.name = "";
-					user.email = "";
-					globScope.login = false;
-				}
-				if(callback) callback(response.data);
-			}, function errorCallback(response) {
-				console.log("error");
-				if(callback) callback(response.data);
-			});
-		},
+		checkLogin: checkLogin,
 		logout: function(callback){
 			$http.get(API_URL + '/user/logout', {
 				withCredentials: true,
@@ -166,6 +157,7 @@ app
 					user.loggedIn = false;
 					user.name = "";
 					user.email = "";
+					user.admin = globScope.admin = false;
 					globScope.login = false;
 				}
 				if(callback) callback(response.data);
@@ -191,6 +183,10 @@ app
 			console.log("error");
 			if(callback) callback(response.data);
 		});
+	}
+})
+.factory('admin', function($http, login){
+	return {
 	}
 });
 

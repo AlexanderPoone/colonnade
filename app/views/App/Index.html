@@ -22,6 +22,9 @@
   <a class="header item" href="./#/">Colonnade</a>
   <a class="item" href="./#/dashboard/">Dashboard</a>
   <div class="right menu">
+    <a class="ui item" href="./#/admin/" ng-hide="!admin">
+      Admin
+    </a>
     <a class="ui item" href="./#/login/" ng-show="!login">
       Login
     </a>
@@ -51,6 +54,9 @@
     </a>
     <a class="item side-menu-button" ng-hide="!login" ng-click="logout()">
       Logout
+    </a>
+    <a class="item side-menu-button" href="./#/admin/" ng-hide="!admin">
+      Admin
     </a>
   </div>
   

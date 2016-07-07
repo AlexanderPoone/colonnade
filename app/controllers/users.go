@@ -66,6 +66,7 @@ func (c Users) Login() revel.Result {
     json.Unmarshal([]byte(bodyBytes), &r)
 
     result, identifier, id, name := models.LoginHandler(c.MongoSession, r.Email, r.Password)
+    admin := models.CheckAdmin(c.MongoSession, id)
 
     // start with initialise response interface
     data := make(map[string]interface{})
@@ -79,6 +80,10 @@ func (c Users) Login() revel.Result {
             c.Session["username"] = identifier[1]
             c.Session["name"] = name
             c.Session["userId"] = id
+            if admin == 0 {
+                c.Session["admin"] = "t"
+                data["data"].(map[string]interface{})["admin"] = true
+            }
         case 1 :
             data["message"] = "Invalid Login Details"
         case 2 :
@@ -109,6 +114,7 @@ func (c Users) Logout() revel.Result {
             if c.Session["username"] != "" { c.Session["username"] = "" }
             if c.Session["name"] != "" { c.Session["name"] = "" }
             if c.Session["userId"] != "" { c.Session["userId"] = "" }
+            if c.Session["admin"] != "" { c.Session["admin"] = "" }
         case 1 :
             data["message"] = "Not Logged In"
     }
@@ -131,6 +137,9 @@ func (c Users) LoginInfo() revel.Result {
             data["data"] = make(map[string]interface{})
             data["data"].(map[string]interface{})["name"] = c.Session["name"]
             data["data"].(map[string]interface{})["email"] = c.Session["email"]
+            if c.Session["admin"] == "t" {
+                data["data"].(map[string]interface{})["admin"] = true
+            }
         case 1 :
             data["message"] = "Not Logged In"
     }

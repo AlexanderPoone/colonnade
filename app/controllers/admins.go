@@ -37,6 +37,7 @@ func (c Admins) IsAdmin() revel.Result {
     switch result {
         case 0 :
             data["message"] = "User is admin"
+            c.Session["admin"] = "t"
         case 1 :
             data["message"] = "User is not logged in"
         case 2 :
