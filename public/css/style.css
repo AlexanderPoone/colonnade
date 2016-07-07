@@ -81,6 +81,13 @@ html, body {
     color: #9F3A38 !important;
 }
 
+.msg404 {
+    text-align: center;
+    top: 50%;
+    position: relative;
+    transform: translateY(-50%);
+}
+
 @media only screen and (min-width: 768px) {
     .login-wrapper {
         height: 100% !important;
