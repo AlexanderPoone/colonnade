@@ -93,7 +93,7 @@ app
 		$scope.page = "listCourses";
 		var page = $routeParams.p ? $routeParams.p : 0 ;
 		admin.getAllCourses(page, function(response){
-			$scope.courses = response.data.data;
+			$scope.courses = response.data.courses;
 			for(var i in $scope.courses){
 				var tempDate = new Date($scope.courses[i].TimeCreated);
 				$scope.courses[i].newDate = tempDate.toLocaleDateString();
