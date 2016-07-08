@@ -302,3 +302,38 @@ func AdminAddUser2Course(s *mgo.Session,
     if result != 0 { return 4, []int{} }
     return 0, successUsers
 }
+
+func GetUserByIdentifier(s *mgo.Session, identifier string, allowSuspend bool) (int, []User_db) {
+    var result []User_db
+    var query bson.M
+    if allowSuspend {
+        query = bson.M{"identifier": bson.M{"$regex": ".*" + identifier + ".*"}}
+    }else{
+        query = bson.M{
+            "$and": []bson.M{
+                bson.M{"identifier": bson.M{"$regex": ".*" + identifier + ".*"}},
+                bson.M{"suspended": false},
+                },
+            }
+    }
+    err := usersCollection(s).Find(query).Select(bson.M{
+        "name": 1,
+        "identifier": 1,
+        "_id": 1,
+    }).Limit(10).All(&result)
+
+    if err != nil { return 1, []User_db{} }
+    return 0, result
+}
+
+func AdminGetUserByIdentifier(s *mgo.Session,
+        user User_t,
+        admin string,
+        identifier string,
+        allowSuspend bool) (int, []User_db) {
+    if IsAdmin(user, admin) != 0 { return 1, []User_db{} }
+
+    status, result := GetUserByIdentifier(s, identifier, allowSuspend)
+    if status != 0 { return 2, []User_db{} }
+    return 0, result
+}
