@@ -274,6 +274,9 @@ app
 			});
 		}
 	}
+})
+.directive("findUser", function(){
+    // todo
 });
 
 $('#menu-button').click(function() {
