@@ -243,7 +243,7 @@ app
 				params: {p: p},
 				withCredentials: true,
 			}).then(function successCallback(response){
-				if(response.data.error == 0) callback(response.data);
+				if(response.data.error == 0) if(callback) callback(response.data);
 			},function errorCallback(response){
 				console.log("error");
 				if(callback) callback(response.data);
@@ -262,6 +262,17 @@ app
 				callback(response.data);
 			})
 		},
+		findUserByIdentifier: function(identifier, callback){
+			$http.get(API_URL + "/admin/findUser", {
+				params: {q: identifier},
+				withCredentials: true,
+			}).then(function successCallback(response){
+				if(response.data.error == 0) if(callback) callback(response.data);
+			}, function errorCallback(response){
+				console.log("error");
+				if(callback) callback(response.data);
+			});
+		}
 	}
 });
 

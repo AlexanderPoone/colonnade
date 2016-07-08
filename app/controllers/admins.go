@@ -169,3 +169,34 @@ func (c Admins) AddUsers2Course(CourseIdHex string) revel.Result {
     }
     return c.RenderJson(data)
 }
+
+func (c Admins) FindUserByIdentifier(q, s string) revel.Result {
+    allowSuspend := true
+    if s == "f" {allowSuspend = false}
+    status, result := models.AdminGetUserByIdentifier(
+        c.MongoSession,
+        models.User_t{
+            Email: c.Session["email"],
+            Username: c.Session["username"],
+            Name: c.Session["name"],
+            UserIdHex: c.Session["userId"],
+        },
+        c.Session["admin"],
+        q,
+        allowSuspend)
+
+    // start with initialise response interface
+    data := make(map[string]interface{})
+    data["error"] = status
+    switch status {
+        case 0 :
+            data["message"] = "Result found"
+            data["data"] = make(map[string]interface{})
+            data["data"].(map[string]interface{})["users"] = result
+        case 1 :
+            data["message"] = "User is not admin"
+        case 2 :
+            data["message"] = "Unexpected Error in Database"
+    }
+    return c.RenderJson(data)
+}
