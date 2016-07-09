@@ -280,7 +280,7 @@ app
         var cooe = 40;
         var inputCooe = 8;
         scope.inputWidth = {
-            width: "8px",
+            width: "18px",
         }
         scope.chosen = [];
         function calcHeight(list, cooe){
@@ -319,7 +319,6 @@ app
             new_user.Email = user.Email;
             new_user.Name = user.Name;
             scope.chosen.push(new_user);
-            console.log(scope.chosen);
             closeSearching();
         }
         scope.remove = function(user){
@@ -328,7 +327,7 @@ app
         }
         scope.queryChange = function(query){
             scope.inputWidth = {
-                width: ((query.length + 1) * inputCooe).toString() + "px",
+                width: (query.length * inputCooe + 10).toString() + "px",
             }
             scope.query = query;
         }

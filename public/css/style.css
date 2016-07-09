@@ -142,6 +142,7 @@ html, body {
     margin: 5px;
     padding: 0 5px;
     border: 0;
+    width: 18px;
 }
 
 .dropdown-search-input:focus {
