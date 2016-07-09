@@ -37,6 +37,17 @@ app
 	}
 })
 .controller("mainCtrl", function($scope, $http, login){
+    $scope.users = [
+        {Id: "12384329", Name: "Daniel Ip", Email: "kg4368@yahoo.com.hk"},
+        {Id: "12384328", Name: "Daniel Ip", Email: "kg4368@yahoo.com.hk"},
+        {Id: "12384327", Name: "Daniel Ip", Email: "kg4368@yahoo.com.hk"},
+        {Id: "12384326", Name: "Daniel Ip", Email: "kg4368@yahoo.com.hk"},
+        {Id: "12384326", Name: "Daniel Ip", Email: "kg4368@yahoo.com.hk"},
+        {Id: "12384326", Name: "Daniel Ip", Email: "kg4368@yahoo.com.hk"},
+        {Id: "12384326", Name: "Daniel Ip", Email: "kg4368@yahoo.com.hk"},
+        {Id: "12384326", Name: "Daniel Ip", Email: "kg4368@yahoo.com.hk"},
+        {Id: "12384326", Name: "Daniel Ip", Email: "kg4368@yahoo.com.hk"},
+    ]
 })
 .controller("dashboardCtrl", function($scope, $http, login){
 })
@@ -276,7 +287,67 @@ app
 	}
 })
 .directive("findUser", function(){
-    // todo
+    function link(scope, elem, attrs, ctrl){
+        var cooe = 40;
+        var inputCooe = 8;
+        scope.inputWidth = {
+            width: "8px",
+        }
+        scope.chosen = [];
+        function calcHeight(list, cooe){
+            try{
+                if(list.length<=1) return (2 * cooe).toString() + "px";
+                if(list.length>=6) return (6 * cooe).toString() + "px";
+                return (list.length * cooe).toString() + "px";
+            } catch (err) {
+                return (2 * cooe).toString() + "px";
+            }
+        }
+        scope.dropdownMain = {};
+        var open = false;
+        function openSearching(){
+            open = true;
+            $('.dropdown-search-input').focus();
+            scope.dropdownMain = {
+                height: calcHeight(scope.options, cooe),
+            };
+        }
+        function closeSearching(){
+            open = false;
+            scope.dropdownMain = {
+                height: cooe.toString() + "px",
+            };
+        }
+        scope.openSearching = function(){openSearching();}
+        scope.toggleSearching = function(){
+            if(!open) openSearching();
+            else closeSearching();
+        }
+        scope.add = function(user){
+            console.log("trying to add user", user);
+            scope.chosen.push(user);
+            closeSearching();
+        }
+        scope.remove = function(user){
+            var i = scope.chosen.indexOf(user);
+            if(i > -1) scope.chosen.splice(i, 1);
+        }
+        scope.queryChange = function(query){
+            console.log("queryChange", ((query.length + 1) * inputCooe).toString() + "px");
+            scope.inputWidth = {
+                width: ((query.length + 1) * inputCooe).toString() + "px",
+            }
+        }
+    }
+    return {
+        restrict: "E",
+        require: ["ngModel"],
+        templateUrl: 'public/template/findUser.html',
+        scope: {
+            options: "=",
+        },
+        link: link,
+    }
 });
 
 $('#menu-button').click(function() {
