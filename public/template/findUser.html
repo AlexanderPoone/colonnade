@@ -1,6 +1,6 @@
 <div class="dropdown-searching" ng-style="dropdownMain">
 	<div class="dropdown-container" ng-click="openSearching()">
-		<span ng-repeat="item in chosen" class="dropdown-chosen-item">{{item.Id}} <i class="remove icon" ng-click="remove(item)"></i></span>
+		<span ng-repeat="item in chosen" class="dropdown-chosen-item">{{item.Name}} <i class="remove icon" ng-click="remove(item)"></i></span>
 		<input ng-model="query" ng-change="queryChange(query)" type="text" class="dropdown-search-input" ng-style="inputWidth">
 	</div>
 	<i class="dropdown icon" ng-click="toggleSearching()"></i>
