@@ -91,8 +91,8 @@ html, body {
     border-radius: 4px;
     border: solid #ddd 1px;
     cursor: text;
-    transition: height 0.3s;
-    overflow-y: hidden;
+    /*overflow-y: hidden;*/
+    position: relative;
 }
 
 .dropdown-container {
@@ -112,7 +112,16 @@ html, body {
 
 .dropdown-item-container {
     height: calc(100% - 42px);
+    position: absolute;
     overflow-y: auto;
+    top: 38px;
+    left: -1px;
+    width: calc(100% + 2px);
+    transition: height 0.3s;
+    background-color: #fff;
+    border-radius: 0 0 4px 4px;
+    border: solid #ddd 0px;
+    border-top: 0;
 }
 
 .dropdown-item {
