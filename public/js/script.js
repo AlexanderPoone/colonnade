@@ -107,7 +107,9 @@ app
             $scope.courses = response.data.courses;
             for(var i in $scope.courses){
                 var tempDate = new Date($scope.courses[i].TimeCreated);
-                $scope.courses[i].newDate = tempDate.toLocaleDateString();
+                $scope.courses[i].newDate = tempDate.getDate().toString() + '/' +
+                                            (tempDate.getMonth() + 1).toString() + '/' +
+                                            tempDate.getFullYear().toString();
             }
         })
     }else if($routeParams.Type="course"){
