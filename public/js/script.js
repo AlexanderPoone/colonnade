@@ -285,11 +285,11 @@ app
         scope.chosen = [];
         function calcHeight(list, cooe){
             try{
-                if(list.length<=1) return (1 * cooe).toString() + "px";
-                if(list.length>=5) return (5 * cooe).toString() + "px";
-                return (list.length * cooe).toString() + "px";
+                if(list.length<=1) return (1 * cooe + 1).toString() + "px";
+                if(list.length>=5) return (5 * cooe + 1).toString() + "px";
+                return (list.length * cooe + 1).toString() + "px";
             } catch (err) {
-                return cooe.toString() + "px";;
+                return (cooe + 1).toString() + "px";;
             }
         }
         scope.dropdownMain = {};
