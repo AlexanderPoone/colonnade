@@ -111,7 +111,7 @@ html, body {
 }
 
 .dropdown-item-container {
-    height: 198px;
+    height: calc(100% - 42px);
     overflow-y: auto;
 }
 
