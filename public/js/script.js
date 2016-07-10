@@ -285,26 +285,35 @@ app
         scope.chosen = [];
         function calcHeight(list, cooe){
             try{
-                if(list.length<=1) return (2 * cooe).toString() + "px";
-                if(list.length>=6) return (6 * cooe).toString() + "px";
-                return ((list.length + 1) * cooe).toString() + "px";
+                if(list.length<=1) return (1 * cooe).toString() + "px";
+                if(list.length>=6) return (5 * cooe).toString() + "px";
+                return (list.length * cooe).toString() + "px";
             } catch (err) {
-                return (2 * cooe).toString() + "px";
+                return "0px";
             }
         }
         scope.dropdownMain = {};
+        scope.dropdownContainer = {};
         var open = false;
         function openSearching(){
             open = true;
             $('.dropdown-search-input').focus();
-            scope.dropdownMain = {
+            scope.dropdownContainer = {
                 height: calcHeight(scope.options, cooe),
+                "border-width": "1px",
+            };
+            scope.dropdownMain = {
+                "border-radius": "4px 4px 0 0",
             };
         }
         function closeSearching(){
             open = false;
+            scope.dropdownContainer = {
+                height: "0px",
+                "border-width": "0px",
+            };
             scope.dropdownMain = {
-                height: cooe.toString() + "px",
+                "border-radius": "4px",
             };
         }
         scope.query = "";
