@@ -62,7 +62,7 @@
       <form class="ui form" ng-show="step.current=='staff'">
         <div class="field">
           <label>Find Users who are the coordinators of the course</label>
-          <find-user ng-change="changeChoice(chosen)" ng-model="chosen" options="users"></find-user>
+          <find-user ng-change="changeData(findUserData)" ng-model="findUserData" options="foundUsers"></find-user>
         </div>
         <button class="ui blue button" type="submit" ng-click="step.handler[1]()">Add</button>
       </form>

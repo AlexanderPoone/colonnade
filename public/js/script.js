@@ -87,6 +87,17 @@ app
     };
 })
 .controller("adminCtrl", function($scope, $routeParams, login, admin){
+    $scope.foundUsers = [];
+    $scope.changeData = function(findUserData){
+        if(findUserData.query.length >= 3){
+            function add2Options(response){
+                $scope.foundUsers = response.data.users;
+            }
+            admin.findUserByIdentifier(findUserData.query, add2Options);
+        }else{
+            $scope.foundUsers = null;
+        }
+    }
     if($routeParams.Type===undefined){
         $scope.page = "main";
     }else if($routeParams.Type=="courses"){
@@ -136,6 +147,9 @@ app
                         }
                     });
             });
+            /*$scope.step.handler.push(function(){
+
+            });*/
         }
     }
 })
