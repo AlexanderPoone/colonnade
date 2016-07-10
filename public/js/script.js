@@ -112,6 +112,7 @@ app
         })
     }else if($routeParams.Type="course"){
         if($routeParams.Id === "new"){
+            var newCourseId = null;
             $scope.page = "newCourse";
             $scope.step = {};
             $scope.step.style = {};
@@ -128,13 +129,14 @@ app
             };
             $scope.step.current = 'info';
             $scope.step.handler = [];
-            $scope.step.handler.push(function(){
+            $scope.step.handler.push(function(courseInfo){
                 $scope.step.style.form0 = {'loading': true };
                 admin.createNewCourse(
-                    $scope.step.data.name,
-                    $scope.step.data.description,
+                    courseInfo.name,
+                    courseInfo.description,
                     function(response){
                         if(response.error == 0){
+                            newCourseId = response.data.courseId;
                             $scope.step.style.form0 = {'loading': false };
                             $scope.step.current = 'staff';
                             $scope.step.style.info = {
@@ -147,9 +149,28 @@ app
                         }
                     });
             });
-            /*$scope.step.handler.push(function(){
+            $scope.step.handler.push(function(users){
+                var reqUsers = [];
+                for(i in users){
+                    reqUsers.push({
+                        uid: users[i].Id,
+                        role: 0,
+                    });
+                }
 
-            });*/
+                admin.addUsers2Course(newCourseId, reqUsers, function(response){
+                    if(response.error == 0){
+                        $scope.step.current = 'done';
+                        $scope.step.style.staff = {
+                            'active': false,
+                        };
+                        $scope.step.style.done = {
+                            'active': true,
+                            'disabled': false,
+                        };
+                    }
+                })
+            });
         }
     }
 })
@@ -276,6 +297,18 @@ app
                 callback(response.data);
             })
         },
+        addUsers2Course: function(courseId, users, callback){
+            $http.post(API_URL + "/admin/course/" + courseId + "/addUsers",{
+                users: users,
+            }, {
+                withCredentials: true,
+            }).then(function successCallback(response){
+                if(callback) callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            })
+        },
         findUserByIdentifier: function(identifier, callback){
             $http.get(API_URL + "/admin/findUser", {
                 params: {q: identifier},
@@ -355,7 +388,7 @@ app
             scope.query = query;
         }
         scope.$watch('chosen+query', function() {  
-            ngModelCtrl.$setViewValue({chose: scope.chosen, query: scope.query});
+            ngModelCtrl.$setViewValue({chosen: scope.chosen, query: scope.query});
         });
         scope.$watch('options', function(){
             if(open){

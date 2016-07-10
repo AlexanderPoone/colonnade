@@ -57,15 +57,17 @@
           <label>Description</label>
           <textarea rows="4" ng-model="step.data.description"></textarea>
         </div>
-        <button class="ui blue button" type="submit" ng-click="step.handler[0]()">Create</button>
+        <button class="ui blue button" type="submit" ng-click="step.handler[0](step.data)">Create</button>
       </form>
       <form class="ui form" ng-show="step.current=='staff'">
+        <p>Great, the course has been created. Now add the coordinators of the course.</p>
         <div class="field">
           <label>Find Users who are the coordinators of the course</label>
           <find-user ng-change="changeData(findUserData)" ng-model="findUserData" options="foundUsers"></find-user>
         </div>
-        <button class="ui blue button" type="submit" ng-click="step.handler[1]()">Add</button>
+        <button class="ui blue button" type="submit" ng-click="step.handler[1](findUserData.chosen)">Add</button>
       </form>
+      <div ng-show="step.current=='done'">All Done! The Coodinators have been added to the course, the course has preliminarily set up</div>
     </div>
   </div>
 </div>
