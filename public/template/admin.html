@@ -59,6 +59,13 @@
         </div>
         <button class="ui blue button" type="submit" ng-click="step.handler[0]()">Create</button>
       </form>
+      <form class="ui form" ng-show="step.current=='staff'">
+        <div class="field">
+          <label>Find Users who are the coordinators of the course</label>
+          <find-user ng-change="changeChoice(chosen)" ng-model="chosen" options="users"></find-user>
+        </div>
+        <button class="ui blue button" type="submit" ng-click="step.handler[1]()">Add</button>
+      </form>
     </div>
   </div>
 </div>

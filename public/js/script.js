@@ -286,10 +286,10 @@ app
         function calcHeight(list, cooe){
             try{
                 if(list.length<=1) return (1 * cooe).toString() + "px";
-                if(list.length>=6) return (5 * cooe).toString() + "px";
+                if(list.length>=5) return (5 * cooe).toString() + "px";
                 return (list.length * cooe).toString() + "px";
             } catch (err) {
-                return "0px";
+                return cooe.toString() + "px";;
             }
         }
         scope.dropdownMain = {};
@@ -336,7 +336,7 @@ app
         }
         scope.queryChange = function(query){
             scope.inputWidth = {
-                width: (query.length * inputCooe + 10).toString() + "px",
+                width: (query.length * inputCooe + 12).toString() + "px",
             }
             scope.query = query;
         }

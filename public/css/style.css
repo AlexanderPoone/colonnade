@@ -146,11 +146,11 @@ html, body {
 }
 
 .dropdown-search-input {
-    line-height: 28px;
-    height: 28px;
-    margin: 5px;
-    padding: 0 5px;
-    border: 0;
+    line-height: 28px !important;
+    height: 28px !important;
+    margin: 5px !important;
+    padding: 0 5px !important;
+    border: 0 !important;
     width: 18px;
 }
 
