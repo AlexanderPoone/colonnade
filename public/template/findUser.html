@@ -6,6 +6,6 @@
 	<i class="dropdown icon" ng-click="toggleSearching()"></i>
 	<div class="dropdown-item-container" ng-style="dropdownContainer">
 		<div class="dropdown-item" ng-hide="options">No item is found.</div>
-		<div ng-repeat="option in options" class="dropdown-item" ng-click="add(option)">{{option.Name}}, {{option.Email}}</div>
+		<div ng-repeat="option in options" class="dropdown-item" ng-click="add(option)">{{option.Name}}, {{option.Identifier[0]}}</div>
 	</div>
 </div>
