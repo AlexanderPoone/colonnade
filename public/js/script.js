@@ -287,7 +287,7 @@ app
             try{
                 if(list.length<=1) return (2 * cooe).toString() + "px";
                 if(list.length>=6) return (6 * cooe).toString() + "px";
-                return (list.length * cooe).toString() + "px";
+                return ((list.length + 1) * cooe).toString() + "px";
             } catch (err) {
                 return (2 * cooe).toString() + "px";
             }
@@ -334,6 +334,13 @@ app
         scope.$watch('chosen+query', function() {  
             ngModelCtrl.$setViewValue({chose: scope.chosen, query: scope.query});
         });
+        scope.$watch('options', function(){
+            if(open){
+                scope.dropdownMain = {
+                    height: calcHeight(scope.options, cooe),
+                };
+            }
+        }, true);
     }
     return {
         restrict: "E",
