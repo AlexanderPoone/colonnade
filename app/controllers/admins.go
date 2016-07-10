@@ -89,7 +89,7 @@ func (c Admins) Courses(p int) revel.Result {
         case 0 :
             data["message"] = "Success"
             data["data"] = make(map[string]interface{})
-            data["data"].(map[string]interface{})["data"] = courses
+            data["data"].(map[string]interface{})["courses"] = courses
         case 1 :
             data["message"] = "User is not admin"
         case 2 :
@@ -132,7 +132,7 @@ func (c Admins) NewCourse() revel.Result {
     return c.RenderJson(data)
 }
 
-func (c Admins) AddUsers2Course(CourseIdHex string) revel.Result {
+func (c Admins) AddUsers2Course(Id string) revel.Result {
     var users struct{
         Users  []models.UserInCourse_t  `json:"users"`
     }
@@ -147,7 +147,7 @@ func (c Admins) AddUsers2Course(CourseIdHex string) revel.Result {
             UserIdHex: c.Session["userId"],
         },
         c.Session["admin"],
-        CourseIdHex,
+        Id,
         users.Users)
 
     // start with initialise response interface

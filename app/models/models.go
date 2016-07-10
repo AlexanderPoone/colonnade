@@ -11,6 +11,7 @@ import (
     "github.com/ip4368/go-password"
     "strings"
     "time"
+    "fmt"
 )
 
 const COODRINATORS = 0
@@ -280,6 +281,8 @@ func AdminAddUser2Course(s *mgo.Session,
         c []UserInCourse_t) (int, []int) {
     if IsAdmin(user, admin) != 0 { return 1, []int{} }
 
+    //isValidCourseId := bson.IsObjectIdHex(UserIdHex)
+    fmt.Println(courseIdHex)
     if !bson.IsObjectIdHex(courseIdHex) { return 2, []int{} }
     courseId := bson.ObjectIdHex(courseIdHex)
 
