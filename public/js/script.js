@@ -365,6 +365,11 @@ app
                 "border-radius": "4px",
             };
         }
+        function updateQueryBox(query){
+            scope.inputWidth = {
+                width: (query.length * inputCooe + 12).toString() + "px",
+            }
+        }
         scope.query = "";
         scope.openSearching = function(){openSearching();}
         scope.toggleSearching = function(){
@@ -377,6 +382,8 @@ app
             new_user.Email = user.Email;
             new_user.Name = user.Name;
             scope.chosen.push(new_user);
+            scope.query = "";
+            updateQueryBox(scope.query);
             closeSearching();
         }
         scope.remove = function(user){
@@ -384,10 +391,7 @@ app
             if(i > -1) scope.chosen.splice(i, 1);
         }
         scope.queryChange = function(query){
-            scope.inputWidth = {
-                width: (query.length * inputCooe + 12).toString() + "px",
-            }
-            scope.query = query;
+            updateQueryBox(query);
         }
         scope.$watch('chosen+query', function() {  
             ngModelCtrl.$setViewValue({chosen: scope.chosen, query: scope.query});
