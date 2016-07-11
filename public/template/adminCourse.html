@@ -1,2 +1,68 @@
 <div class="content-wrapper">
+  <div class="ui container">
+    <h1>{{course.Name}}</h1>
+    <p>Created on {{course.newDate}} | {{course.Suspended ? 'Suspended' : 'Active'}}</p>
+    <div class="ui divider"></div>
+    <p>{{course.Description}}</p>
+    <div class="ui divider"></div>
+    <h3>Coordinator(s)</h3>
+    <table class="ui celled padded table">
+      <thead>
+        <tr>
+          <th class="single line">Name</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Suspended</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="user in course.Users | filter : {Role: ROLES.COORDINATOR}">
+          <td class="ui center aligned">{{user.Detail.Name}}</td>
+          <td class="ui center aligned">{{user.Detail.Username}}</td>
+          <td class="ui center aligned">{{user.Detail.Email}}</td>
+          <td class="ui center aligned">{{user.Detail.Suspended}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="ui divider"></div>
+    <h3>Tutor(s)</h3>
+    <table class="ui celled padded table">
+      <thead>
+        <tr>
+          <th class="single line">Name</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Suspended</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="user in course.Users | filter : {Role: ROLES.TUTOR}">
+          <td class="ui center aligned">{{user.Detail.Name}}</td>
+          <td class="ui center aligned">{{user.Detail.Username}}</td>
+          <td class="ui center aligned">{{user.Detail.Email}}</td>
+          <td class="ui center aligned">{{user.Detail.Suspended}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="ui divider"></div>
+    <h3>Student(s)</h3>
+    <table class="ui celled padded table">
+      <thead>
+        <tr>
+          <th class="single line">Name</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Suspended</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="user in course.Users | filter : {Role: ROLES.STUDENT}">
+          <td class="ui center aligned">{{user.Detail.Name}}</td>
+          <td class="ui center aligned">{{user.Detail.Username}}</td>
+          <td class="ui center aligned">{{user.Detail.Email}}</td>
+          <td class="ui center aligned">{{user.Detail.Suspended}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
