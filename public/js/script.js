@@ -28,7 +28,7 @@ app
     .when('/admin/course/new',{
         templateUrl:'public/template/adminNewCourse.html',
         controller:'adminNewCourseCtrl'})
-    .when('/admin/course/:Id?',{
+    .when('/admin/course/:Id',{
         templateUrl:'public/template/adminCourse.html',
         controller:'adminCourseCtrl'})
     .otherwise({
@@ -181,10 +181,19 @@ app
             }
         })
     });
-
 })
-.controller("adminCourseCtrl", function($scope, $routeParams, login, admin){
-
+.controller("adminCourseCtrl", function($scope, $routeParams, login, admin, ROLES){
+    $scope.ROLES = ROLES;
+    
+    admin.getCourseDetail($routeParams.Id, function(result){
+        if(result.error == 0){
+            $scope.course = result.data.course;
+            var tempDate = new Date($scope.course.TimeCreated);
+            $scope.course.newDate = tempDate.getDate().toString() + '/' +
+                                    (tempDate.getMonth() + 1).toString() + '/' +
+                                    tempDate.getFullYear().toString();
+        }
+    });
 })
 .controller("404Ctrl", function($scope, $http, login){
 })
@@ -296,7 +305,7 @@ app
                 if(callback) callback(response.data);
             });
         },
-        getCourseDetail: function(courseId){
+        getCourseDetail: function(courseId, callback){
             $http.get(API_URL + "/admin/course/" + courseId, {
                 withCredentials: true,
             }).then(function successCallback(response){
@@ -433,7 +442,8 @@ app
         },
         link: link,
     }
-});
+})
+.constant('ROLES', {COORDINATOR: 0, TUTOR: 1, STUDENT: 2});
 
 $('#menu-button').click(function() {
     $('.ui.sidebar').sidebar('toggle');
