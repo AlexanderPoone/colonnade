@@ -11,7 +11,6 @@ import (
     "github.com/ip4368/go-password"
     "strings"
     "time"
-    "fmt"
 )
 
 const COODRINATORS = 0
@@ -46,12 +45,26 @@ type UserInCourse_t struct {
 }
 
 type Course_db struct {
-    Name string                    `bson:"name"`
+    Name        string             `bson:"name"`
     Description string             `bson:"description"`
     Suspended   bool               `bson:"suspended,omitempty"`
     Users       []UserInCourse_db  `bson:"users,omitempty"`
     TimeCreated time.Time          `bson:"timeCreated,omitempty"`
     Id          bson.ObjectId      `bson:"_id,omitempty"`
+}
+
+type AggregateUser_t struct {
+    Detail User_db
+    Role   int
+}
+
+type CourseWithUsers_t struct {
+    Name        string
+    Description string
+    Suspended   bool
+    Users       []AggregateUser_t
+    TimeCreated time.Time
+    Id          bson.ObjectId
 }
 
 type Course_t struct {
@@ -246,6 +259,47 @@ func AdminCourses(s *mgo.Session, user User_t, admin string, page int) (int, []C
     return 0, result
 }
 
+func AdminCourse(s *mgo.Session, user User_t, admin, courseIdHex string) (int, CourseWithUsers_t) {
+    // check admin
+    if IsAdmin(user, admin) != 0 { return 1, CourseWithUsers_t{} }
+
+    // check validity of courseId
+    if !bson.IsObjectIdHex(courseIdHex) { return 2, CourseWithUsers_t{} }
+    courseId := bson.ObjectIdHex(courseIdHex)
+
+    // query to database
+    var course Course_db
+    err := coursesCollection(s).Find(bson.M{
+        "_id": courseId,
+    }).One(&course)
+
+    var aggregateUsers []AggregateUser_t
+    for _, value := range course.Users{
+        var user User_db
+        usersCollection(s).Find(bson.M{
+            "_id": value.Id,
+        }).Select(bson.M{
+            "_id"        : 1,
+            "identifier" : 1,
+            "name"       : 1,
+            "suspended"  : 1,
+        }).One(&user)
+        aggregateUsers = append(aggregateUsers, AggregateUser_t{
+            Detail : user,
+            Role   : value.Role,
+        })
+    }
+    var aggregateCourse CourseWithUsers_t
+    aggregateCourse.Name        = course.Name
+    aggregateCourse.Description = course.Description
+    aggregateCourse.Suspended   = course.Suspended
+    aggregateCourse.Users       = aggregateUsers
+    aggregateCourse.TimeCreated = course.TimeCreated
+    aggregateCourse.Id          = course.Id
+    if err != nil { return 3, CourseWithUsers_t{} }
+    return 0, aggregateCourse
+}
+
 func AdminNewCourse(s *mgo.Session, user User_t, admin string, course Course_t) (int, string) {
     if IsAdmin(user, admin) != 0 { return 1, "" }
 
@@ -281,8 +335,6 @@ func AdminAddUser2Course(s *mgo.Session,
         c []UserInCourse_t) (int, []int) {
     if IsAdmin(user, admin) != 0 { return 1, []int{} }
 
-    //isValidCourseId := bson.IsObjectIdHex(UserIdHex)
-    fmt.Println(courseIdHex)
     if !bson.IsObjectIdHex(courseIdHex) { return 2, []int{} }
     courseId := bson.ObjectIdHex(courseIdHex)
 
