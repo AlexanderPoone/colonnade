@@ -322,10 +322,10 @@ app
             }, {
                 withCredentials: true,
             }).then(function successCallback(response){
-                callback(response.data);
+                if(callback) callback(response.data);
             }, function errorCallback(response){
                 console.log("error");
-                callback(response.data);
+                if(callback) callback(response.data);
             })
         },
         getAllUsers: function(p, callback){
