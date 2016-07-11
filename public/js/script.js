@@ -19,9 +19,18 @@ app
     .when('/login/',{
         templateUrl:'public/template/login.html',
         controller:'loginCtrl'})
-    .when('/admin/:Type?/:Id?',{
+    .when('/admin/',{
         templateUrl:'public/template/admin.html',
         controller:'adminCtrl'})
+    .when('/admin/courses/',{
+        templateUrl:'public/template/adminCourses.html',
+        controller:'adminCoursesCtrl'})
+    .when('/admin/course/new',{
+        templateUrl:'public/template/adminNewCourse.html',
+        controller:'adminNewCourseCtrl'})
+    .when('/admin/course/:Id?',{
+        templateUrl:'public/template/adminCourse.html',
+        controller:'adminCourseCtrl'})
     .otherwise({
         templateUrl:'public/template/404.html',
         controller:'404Ctrl'});
@@ -86,7 +95,22 @@ app
         $scope.regInvalid = invalid;
     };
 })
-.controller("adminCtrl", function($scope, $routeParams, login, admin){
+.controller("adminCtrl", function($scope){
+})
+.controller("adminCoursesCtrl", function($scope, $routeParams, login, admin){
+    $scope.page = "listCourses";
+    var page = $routeParams.p ? $routeParams.p : 0 ;
+    admin.getAllCourses(page, function(response){
+        $scope.courses = response.data.courses;
+        for(var i in $scope.courses){
+            var tempDate = new Date($scope.courses[i].TimeCreated);
+            $scope.courses[i].newDate = tempDate.getDate().toString() + '/' +
+                                        (tempDate.getMonth() + 1).toString() + '/' +
+                                        tempDate.getFullYear().toString();
+        }
+    });
+})
+.controller("adminNewCourseCtrl", function($scope, $routeParams, login, admin){
     $scope.foundUsers = [];
     $scope.changeData = function(findUserData){
         if(findUserData.query.length >= 3){
@@ -98,83 +122,69 @@ app
             $scope.foundUsers = null;
         }
     }
-    if($routeParams.Type===undefined){
-        $scope.page = "main";
-    }else if($routeParams.Type=="courses"){
-        $scope.page = "listCourses";
-        var page = $routeParams.p ? $routeParams.p : 0 ;
-        admin.getAllCourses(page, function(response){
-            $scope.courses = response.data.courses;
-            for(var i in $scope.courses){
-                var tempDate = new Date($scope.courses[i].TimeCreated);
-                $scope.courses[i].newDate = tempDate.getDate().toString() + '/' +
-                                            (tempDate.getMonth() + 1).toString() + '/' +
-                                            tempDate.getFullYear().toString();
-            }
-        })
-    }else if($routeParams.Type="course"){
-        if($routeParams.Id === "new"){
-            var newCourseId = null;
-            $scope.page = "newCourse";
-            $scope.step = {};
-            $scope.step.style = {};
-            $scope.step.style.info = {
-                'active': true,
-            };
-            $scope.step.style.staff = {
-                'active': false,
-                'disabled': true,
-            };
-            $scope.step.style.done = {
-                'active': false,
-                'disabled': true,
-            };
-            $scope.step.current = 'info';
-            $scope.step.handler = [];
-            $scope.step.handler.push(function(courseInfo){
-                $scope.step.style.form0 = {'loading': true };
-                admin.createNewCourse(
-                    courseInfo.name,
-                    courseInfo.description,
-                    function(response){
-                        if(response.error == 0){
-                            newCourseId = response.data.courseId;
-                            $scope.step.style.form0 = {'loading': false };
-                            $scope.step.current = 'staff';
-                            $scope.step.style.info = {
-                                'active': false,
-                            };
-                            $scope.step.style.staff = {
-                                'active': true,
-                                'disabled': false,
-                            };
-                        }
-                    });
-            });
-            $scope.step.handler.push(function(users){
-                var reqUsers = [];
-                for(i in users){
-                    reqUsers.push({
-                        uid: users[i].Id,
-                        role: 0,
-                    });
+    var newCourseId = null;
+    $scope.page = "newCourse";
+    $scope.step = {};
+    $scope.step.style = {};
+    $scope.step.style.info = {
+        'active': true,
+    };
+    $scope.step.style.staff = {
+        'active': false,
+        'disabled': true,
+    };
+    $scope.step.style.done = {
+        'active': false,
+        'disabled': true,
+    };
+    $scope.step.current = 'info';
+    $scope.step.handler = [];
+    $scope.step.handler.push(function(courseInfo){
+        $scope.step.style.form0 = {'loading': true };
+        admin.createNewCourse(
+            courseInfo.name,
+            courseInfo.description,
+            function(response){
+                if(response.error == 0){
+                    newCourseId = response.data.courseId;
+                    $scope.step.style.form0 = {'loading': false };
+                    $scope.step.current = 'staff';
+                    $scope.step.style.info = {
+                        'active': false,
+                    };
+                    $scope.step.style.staff = {
+                        'active': true,
+                        'disabled': false,
+                    };
                 }
-
-                admin.addUsers2Course(newCourseId, reqUsers, function(response){
-                    if(response.error == 0){
-                        $scope.step.current = 'done';
-                        $scope.step.style.staff = {
-                            'active': false,
-                        };
-                        $scope.step.style.done = {
-                            'active': true,
-                            'disabled': false,
-                        };
-                    }
-                })
+            });
+    });
+    $scope.step.handler.push(function(users){
+        var reqUsers = [];
+        for(i in users){
+            reqUsers.push({
+                uid: users[i].Id,
+                role: 0,
             });
         }
-    }
+
+        admin.addUsers2Course(newCourseId, reqUsers, function(response){
+            if(response.error == 0){
+                $scope.step.current = 'done';
+                $scope.step.style.staff = {
+                    'active': false,
+                };
+                $scope.step.style.done = {
+                    'active': true,
+                    'disabled': false,
+                };
+            }
+        })
+    });
+
+})
+.controller("adminCourseCtrl", function($scope, $routeParams, login, admin){
+
 })
 .controller("404Ctrl", function($scope, $http, login){
 })
@@ -283,6 +293,16 @@ app
                 if(response.data.error == 0) if(callback) callback(response.data);
             },function errorCallback(response){
                 console.log("error");
+                if(callback) callback(response.data);
+            });
+        },
+        getCourseDetail: function(courseId){
+            $http.get(API_URL + "/admin/course/" + courseId, {
+                withCredentials: true,
+            }).then(function successCallback(response){
+                if(callback) callback(response.data);
+            }, function errorCallback(response){
+                console.log(response);
                 if(callback) callback(response.data);
             });
         },

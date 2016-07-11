@@ -1,0 +1,23 @@
+<div class="content-wrapper">
+  <div class="ui stackable container">
+    <table class="ui celled striped table">
+      <thead>
+        <tr>
+          <th colspan="3">
+            Courses
+          </th>
+        </tr>
+        <tr>
+          <th>Name</th><th>Description</th><th>Time Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="course in courses">
+          <td><a ng-href="./#/admin/course/{{course.Id}}" ng-bind="course.Name"></a></td>
+          <td ng-bind="course.Description"></td>
+          <td ng-bind="course.newDate"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
