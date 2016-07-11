@@ -17,7 +17,7 @@
       </thead>
       <tbody>
         <tr ng-repeat="user in course.Users | filter : {Role: ROLES.COORDINATOR}">
-          <td class="ui center aligned">{{user.Detail.Name}}</td>
+          <td class="ui center aligned"><a ng-href="./#/admin/user/{{user.Detail.Id}}">{{user.Detail.Name}}</a></td>
           <td class="ui center aligned">{{user.Detail.Identifier[1]}}</td>
           <td class="ui center aligned">{{user.Detail.Identifier[0]}}</td>
           <td class="ui center aligned">{{user.Detail.Suspended}}</td>
@@ -37,7 +37,7 @@
       </thead>
       <tbody>
         <tr ng-repeat="user in course.Users | filter : {Role: ROLES.TUTOR}">
-          <td class="ui center aligned">{{user.Detail.Name}}</td>
+          <td class="ui center aligned"><a ng-href="./#/admin/user/{{user.Detail.Id}}">{{user.Detail.Name}}</a></td>
           <td class="ui center aligned">{{user.Detail.Identifier[1]}}</td>
           <td class="ui center aligned">{{user.Detail.Identifier[0]}}</td>
           <td class="ui center aligned">{{user.Detail.Suspended}}</td>
@@ -57,7 +57,7 @@
       </thead>
       <tbody>
         <tr ng-repeat="user in course.Users | filter : {Role: ROLES.STUDENT}">
-          <td class="ui center aligned">{{user.Detail.Name}}</td>
+          <td class="ui center aligned"><a ng-href="./#/admin/user/{{user.Detail.Id}}">{{user.Detail.Name}}</a></td>
           <td class="ui center aligned">{{user.Detail.Identifier[1]}}</td>
           <td class="ui center aligned">{{user.Detail.Identifier[0]}}</td>
           <td class="ui center aligned">{{user.Detail.Suspended}}</td>
