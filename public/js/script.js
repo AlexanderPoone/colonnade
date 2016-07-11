@@ -31,6 +31,9 @@ app
     .when('/admin/course/:Id',{
         templateUrl:'public/template/adminCourse.html',
         controller:'adminCourseCtrl'})
+    .when('/admin/users/',{
+        templateUrl:'public/template/adminUsers.html',
+        controller:'adminUsersCtrl'})
     .otherwise({
         templateUrl:'public/template/404.html',
         controller:'404Ctrl'});
@@ -195,6 +198,18 @@ app
         }
     });
 })
+.controller("adminUsersCtrl", function($scope, $routeParams, login, admin){
+    var page = $routeParams.p ? $routeParams.p : 0 ;
+    admin.getAllCourses(page, function(response){
+        $scope.courses = response.data.courses;
+        for(var i in $scope.courses){
+            var tempDate = new Date($scope.courses[i].TimeCreated);
+            $scope.courses[i].newDate = tempDate.getDate().toString() + '/' +
+                                        (tempDate.getMonth() + 1).toString() + '/' +
+                                        tempDate.getFullYear().toString();
+        }
+    });
+})
 .controller("404Ctrl", function($scope, $http, login){
 })
 .factory('login', function($http){
@@ -338,7 +353,7 @@ app
                 console.log("error");
                 if(callback) callback(response.data);
             });
-        }
+        },
         addUsers2Course: function(courseId, users, callback){
             $http.post(API_URL + "/admin/course/" + courseId + "/addUsers",{
                 users: users,
