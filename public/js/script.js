@@ -328,6 +328,17 @@ app
                 callback(response.data);
             })
         },
+        getAllUsers: function(p, callback){
+            $http.get(API_URL + "/admin/users", {
+                params: {p: p},
+                withCredentials: true,
+            }).then(function successCallback(response){
+                if(callback) callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            });
+        }
         addUsers2Course: function(courseId, users, callback){
             $http.post(API_URL + "/admin/course/" + courseId + "/addUsers",{
                 users: users,
