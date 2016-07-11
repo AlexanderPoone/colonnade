@@ -200,14 +200,8 @@ app
 })
 .controller("adminUsersCtrl", function($scope, $routeParams, login, admin){
     var page = $routeParams.p ? $routeParams.p : 0 ;
-    admin.getAllCourses(page, function(response){
-        $scope.courses = response.data.courses;
-        for(var i in $scope.courses){
-            var tempDate = new Date($scope.courses[i].TimeCreated);
-            $scope.courses[i].newDate = tempDate.getDate().toString() + '/' +
-                                        (tempDate.getMonth() + 1).toString() + '/' +
-                                        tempDate.getFullYear().toString();
-        }
+    admin.getAllUsers(page, function(response){
+        $scope.users = response.data.users;
     });
 })
 .controller("404Ctrl", function($scope, $http, login){
