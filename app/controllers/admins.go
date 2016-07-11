@@ -100,6 +100,37 @@ func (c Admins) Courses(p int) revel.Result {
     return c.RenderJson(data)
 }
 
+func (c Admins) Course(Id string) revel.Result {
+    result, course := models.AdminCourse(
+        c.MongoSession,
+        models.User_t{
+            Email: c.Session["email"],
+            Username: c.Session["username"],
+            Name: c.Session["name"],
+            UserIdHex: c.Session["userId"],
+        },
+        c.Session["admin"],
+        Id,
+    )
+
+    // start with initialise response interface
+    data := make(map[string]interface{})
+    data["error"] = result
+    switch result {
+        case 0 :
+            data["message"] = "Success"
+            data["data"] = make(map[string]interface{})
+            data["data"].(map[string]interface{})["course"] = course
+        case 1 :
+            data["message"] = "User is not admin"
+        case 2 :
+            data["message"] = "Course Id is not valid"
+        case 3 :
+            data["message"] = "Unexpected Error in Database"
+    }
+    return c.RenderJson(data)
+}
+
 func (c Admins) NewCourse() revel.Result {
     // read request body to byte
     var course models.Course_t

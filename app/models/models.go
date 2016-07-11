@@ -246,6 +246,24 @@ func AdminCourses(s *mgo.Session, user User_t, admin string, page int) (int, []C
     return 0, result
 }
 
+func AdminCourse(s *mgo.Session, user User_t, admin, courseIdHex string) (int, Course_db) {
+    // check admin
+    if IsAdmin(user, admin) != 0 { return 1, Course_db{} }
+
+    // check validity of courseId
+    if !bson.IsObjectIdHex(courseIdHex) { return 2, Course_db{} }
+    courseId := bson.ObjectIdHex(courseIdHex)
+
+    // query to database
+    var course Course_db
+    err := coursesCollection(s).Find(bson.M{
+        "_id": courseId,
+    }).One(&course)
+
+    if err != nil { return 3, Course_db{} }
+    return 0, course
+}
+
 func AdminNewCourse(s *mgo.Session, user User_t, admin string, course Course_t) (int, string) {
     if IsAdmin(user, admin) != 0 { return 1, "" }
 
