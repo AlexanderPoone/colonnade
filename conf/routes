@@ -30,6 +30,7 @@ GET		/api/admin/courses                      Admins.Courses()
 GET		/api/admin/users                        Admins.Users()
 POST	/api/admin/course/new                   Admins.NewCourse()
 POST	/api/admin/course/:Id/addUsers          Admins.AddUsers2Course()
+GET		/api/admin/course/:Id/update            Admins.UpdateCourse()
 GET		/api/admin/course/:Id                   Admins.Course()
 GET		/api/admin/findUser                     Admins.FindUserByIdentifier()
 

@@ -77,6 +77,13 @@ type Admin_t struct {
     Id     bson.ObjectId `bson:"_id,omitempty"`
 }
 
+type Details_t struct {
+    details []struct {
+        updateType  string       `json:"t"`
+        updateValue interface{}  `json:"v"`
+    } `json:"d"`
+}
+
 func GuardUsers() {
     localDBSession, err := mgo.Dial("mongodb://localhost/colonnade")
     if err != nil {
@@ -373,6 +380,58 @@ func AdminAddUser2Course(s *mgo.Session,
     result := AddUser2Course(s, courseId, users)
     if result != 0 { return 4, []int{} }
     return 0, successUsers
+}
+
+func UpdateCourseName(s *mgo.Session, courseId bson.ObjectId, data string) int {
+    err := coursesCollection(s).Update(
+        bson.M{"_id": courseId},
+        bson.M{"Name": data},
+    )
+    if err != nil { return 1 }
+    return 0
+}
+
+func UpdateCourseDescription(s *mgo.Session, courseId bson.ObjectId, data string) int {
+    err := coursesCollection(s).Update(
+        bson.M{"_id": courseId},
+        bson.M{"Description": data},
+    )
+    if err != nil { return 1 }
+    return 0
+}
+
+func UpdateCourseSuspended(s *mgo.Session, courseId bson.ObjectId, data bool) int {
+    err := coursesCollection(s).Update(
+        bson.M{"_id": courseId},
+        bson.M{"Description": data},
+    )
+    if err != nil { return 1 }
+    return 0
+}
+
+func AdminUpdateCourse(s *mgo.Session, user User_t, admin, IdHex string, details Details_t) (int, []int) {
+    if IsAdmin(user, admin) != 0 { return 1, []int{} }
+
+    if !bson.IsObjectIdHex(IdHex) { return 2, []int{} }
+    Id := bson.ObjectIdHex(IdHex)
+
+    var success bool = false
+    var indivSucc []int
+    for _, value := range details.details {
+        var tempSuccess int
+        switch value.updateType {
+            case "Name":
+                tempSuccess = UpdateCourseName(s, Id, value.updateValue.(string))
+            case "Description":
+                tempSuccess = UpdateCourseDescription(s, Id, value.updateValue.(string))
+            case "Suspended":
+                tempSuccess = UpdateCourseSuspended(s, Id, value.updateValue.(bool))
+        }
+        indivSucc = append(indivSucc, tempSuccess)
+        if tempSuccess == 0 { success = true }
+    }
+    if !success { return 3, []int{} }
+    return 0, indivSucc
 }
 
 func GetUserByIdentifier(s *mgo.Session, identifier string, allowSuspend bool) (int, []User_db) {
