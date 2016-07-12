@@ -371,6 +371,18 @@ app
                 if(callback) callback(response.data);
             });
         }
+        updateDetail: function(courseId, details, callback){
+            $http.post(API_URL + "/admin/course/" + courseId + "/update", {
+                details: details,
+            },{
+                withCredentials: true,
+            }).then(function successCallback(response){
+                if(callback) callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            })
+        }
     }
 })
 .directive("findUser", function(){
