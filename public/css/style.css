@@ -158,6 +158,13 @@ html, body {
     outline: 0;
 }
 
+.edit-tag {
+    float: right;
+    display: inline;
+    cursor: pointer;
+    color: #4183C4;
+}
+
 .msg404 {
     text-align: center;
 }

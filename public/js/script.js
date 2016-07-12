@@ -31,6 +31,9 @@ app
     .when('/admin/course/:Id',{
         templateUrl:'public/template/adminCourse.html',
         controller:'adminCourseCtrl'})
+    .when('/admin/users/',{
+        templateUrl:'public/template/adminUsers.html',
+        controller:'adminUsersCtrl'})
     .otherwise({
         templateUrl:'public/template/404.html',
         controller:'404Ctrl'});
@@ -195,6 +198,12 @@ app
         }
     });
 })
+.controller("adminUsersCtrl", function($scope, $routeParams, login, admin){
+    var page = $routeParams.p ? $routeParams.p : 0 ;
+    admin.getAllUsers(page, function(response){
+        $scope.users = response.data.users;
+    });
+})
 .controller("404Ctrl", function($scope, $http, login){
 })
 .factory('login', function($http){
@@ -322,11 +331,22 @@ app
             }, {
                 withCredentials: true,
             }).then(function successCallback(response){
-                callback(response.data);
+                if(callback) callback(response.data);
             }, function errorCallback(response){
                 console.log("error");
-                callback(response.data);
+                if(callback) callback(response.data);
             })
+        },
+        getAllUsers: function(p, callback){
+            $http.get(API_URL + "/admin/users", {
+                params: {p: p},
+                withCredentials: true,
+            }).then(function successCallback(response){
+                if(callback) callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            });
         },
         addUsers2Course: function(courseId, users, callback){
             $http.post(API_URL + "/admin/course/" + courseId + "/addUsers",{

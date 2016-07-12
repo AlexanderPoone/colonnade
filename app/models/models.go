@@ -255,7 +255,7 @@ func AdminCourses(s *mgo.Session, user User_t, admin string, page int) (int, []C
         "_id": 1,
     }).Skip(skip).Limit(limit).All(&result)
 
-    if err != nil { return 3, []Course_db{} }
+    if err != nil { return 2, []Course_db{} }
     return 0, result
 }
 
@@ -298,6 +298,23 @@ func AdminCourse(s *mgo.Session, user User_t, admin, courseIdHex string) (int, C
     aggregateCourse.Id          = course.Id
     if err != nil { return 3, CourseWithUsers_t{} }
     return 0, aggregateCourse
+}
+
+func AdminUsers(s *mgo.Session, user User_t, admin string, page int) (int, []User_db) {
+    if IsAdmin(user, admin) != 0 { return 1, []User_db{} }
+
+    var result []User_db
+    var limit = 20
+    var skip = page * 20
+    err := usersCollection(s).Find(bson.M{}).Select(bson.M{
+        "_id"        : 1,
+        "identifier" : 1,
+        "name"       : 1,
+        "suspended"  : 1,
+    }).Skip(skip).Limit(limit).All(&result)
+
+    if err != nil { return 2, []User_db{} }
+    return 0, result
 }
 
 func AdminNewCourse(s *mgo.Session, user User_t, admin string, course Course_t) (int, string) {
