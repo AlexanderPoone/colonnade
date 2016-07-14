@@ -188,15 +188,51 @@ app
 .controller("adminCourseCtrl", function($scope, $routeParams, login, admin, ROLES){
     $scope.ROLES = ROLES;
     
-    admin.getCourseDetail($routeParams.Id, function(result){
+    var courseId = $routeParams.Id;
+    var originalDetail;
+    $scope.editingTitleBlock = false;
+
+    admin.getCourseDetail(courseId, function(result){
         if(result.error == 0){
-            $scope.course = result.data.course;
+            originalDetail = result.data.course;
+            $scope.course = Object.assign({}, originalDetail);
             var tempDate = new Date($scope.course.TimeCreated);
             $scope.course.newDate = tempDate.getDate().toString() + '/' +
                                     (tempDate.getMonth() + 1).toString() + '/' +
                                     tempDate.getFullYear().toString();
         }
     });
+
+    $scope.editTitleBlock = function(){
+        $scope.editingTitleBlock = true;
+        $('.ui.checkbox').checkbox();
+    }
+
+    $scope.submitTitleBlock = function(){
+        var details = [];
+        if($scope.course.Name != originalDetail.Name){
+            details.push({
+                t: "Name",
+                v: $scope.course.Name,
+            })
+        }
+        if($scope.course.Suspended != originalDetail.Suspended){
+            details.push({
+                t: "Suspended",
+                v: $scope.course.Suspended,
+            })
+        }
+        admin.updateCourse(courseId, details, function(res){
+            if(res.error == 0){
+                originalDetail.Name = $scope.course.Name;
+                originalDetail.Suspended = $scope.course.Suspended;
+            }else{
+                $scope.course.Name = originalDetail.Name;
+                $scope.course.Suspended = originalDetail.Suspended;
+            }
+            $scope.editingTitleBlock = false;
+        })
+    }
 })
 .controller("adminUsersCtrl", function($scope, $routeParams, login, admin){
     var page = $routeParams.p ? $routeParams.p : 0 ;
@@ -320,7 +356,7 @@ app
             }).then(function successCallback(response){
                 if(callback) callback(response.data);
             }, function errorCallback(response){
-                console.log(response);
+                console.log("error");
                 if(callback) callback(response.data);
             });
         },
@@ -371,9 +407,9 @@ app
                 if(callback) callback(response.data);
             });
         },
-        updateDetail: function(courseId, details, callback){
+        updateCourse: function(courseId, details, callback){
             $http.post(API_URL + "/admin/course/" + courseId + "/update", {
-                details: details,
+                d: details,
             },{
                 withCredentials: true,
             }).then(function successCallback(response){

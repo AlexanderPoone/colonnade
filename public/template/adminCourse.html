@@ -1,7 +1,20 @@
 <div class="content-wrapper">
   <div class="ui container">
-    <div><h1 style="display: inline;">{{course.Name}}</h1><span class="edit-tag">Edit</span></div>
-    <p>Created on {{course.newDate}} | {{course.Suspended ? 'Suspended' : 'Active'}}</p>
+    <div ng-hide="editingTitleBlock">
+      <div><h1 style="display: inline;">{{course.Name}}</h1><span class="edit-tag" ng-click="editTitleBlock()">Edit</span></div>
+      <p>Created on {{course.newDate}} | {{course.Suspended ? 'Suspended' : 'Active'}}</p>
+    </div>
+    <div ng-show="editingTitleBlock">
+      <form class="ui form">
+        <div class="field">
+          <input type="text" name="first-name" placeholder="Title" ng-model="course.Name">
+        </div>
+        Created on {{course.newDate}} | 
+          <input type="checkbox" ng-model="course.Suspended">
+        <span ng-show="course.Suspended">Suspended</span><span ng-hide="course.Suspended">Active</span>
+        <button class="ui right floated blue button" type="submit" ng-click="submitTitleBlock()">Done</button>
+      </form>
+    </div>
     <div class="ui divider"></div>
     <p>{{course.Description}}<span class="edit-tag">Edit</span></p>
     <div class="ui divider"></div>
