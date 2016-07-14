@@ -226,16 +226,19 @@ app
                 v: $scope.course.Suspended,
             })
         }
-        admin.updateCourse(courseId, details, function(res){
-            if(res.error == 0){
-                originalDetail.Name = $scope.course.Name;
-                originalDetail.Suspended = $scope.course.Suspended;
-            }else{
-                $scope.course.Name = originalDetail.Name;
-                $scope.course.Suspended = originalDetail.Suspended;
-            }
-            $scope.editingTitleBlock = false;
-        })
+
+        if(details.length){  // only do work if somewhere need to be updated
+            admin.updateCourse(courseId, details, function(res){
+                if(res.error == 0){
+                    originalDetail.Name = $scope.course.Name;
+                    originalDetail.Suspended = $scope.course.Suspended;
+                }else{
+                    $scope.course.Name = originalDetail.Name;
+                    $scope.course.Suspended = originalDetail.Suspended;
+                }
+            });
+        }
+        $scope.editingTitleBlock = false;
     }
 
     $scope.submitDescription = function(){
@@ -246,14 +249,16 @@ app
                 v: $scope.course.Description,
             })
         }
-        admin.updateCourse(courseId, details, function(res){
-            if(res.error == 0){
-                originalDetail.Description = $scope.course.Description;
-            }else{
-                $scope.course.Description = originalDetail.Description;
-            }
-            $scope.editingDescription = false;
-        })
+        if(details.length){  // only do work if somewhere need to be updated
+            admin.updateCourse(courseId, details, function(res){
+                if(res.error == 0){
+                    originalDetail.Description = $scope.course.Description;
+                }else{
+                    $scope.course.Description = originalDetail.Description;
+                }
+            });
+        }
+        $scope.editingDescription = false;
     }
 })
 .controller("adminUsersCtrl", function($scope, $routeParams, login, admin){
