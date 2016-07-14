@@ -208,6 +208,10 @@ app
         $('.ui.checkbox').checkbox();
     }
 
+    $scope.editDescription = function(){
+        $scope.editingDescription = true;
+    }
+
     $scope.submitTitleBlock = function(){
         var details = [];
         if($scope.course.Name != originalDetail.Name){
@@ -231,6 +235,24 @@ app
                 $scope.course.Suspended = originalDetail.Suspended;
             }
             $scope.editingTitleBlock = false;
+        })
+    }
+
+    $scope.submitDescription = function(){
+        var details = [];
+        if($scope.course.Description != originalDetail.Description){
+            details.push({
+                t: "Description",
+                v: $scope.course.Description,
+            })
+        }
+        admin.updateCourse(courseId, details, function(res){
+            if(res.error == 0){
+                originalDetail.Description = $scope.course.Description;
+            }else{
+                $scope.course.Description = originalDetail.Description;
+            }
+            $scope.editingDescription = false;
         })
     }
 })

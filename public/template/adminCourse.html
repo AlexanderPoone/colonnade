@@ -7,7 +7,7 @@
     <div ng-show="editingTitleBlock">
       <form class="ui form">
         <div class="field">
-          <input type="text" name="first-name" placeholder="Title" ng-model="course.Name">
+          <input type="text" name="name" placeholder="Title" ng-model="course.Name">
         </div>
         Created on {{course.newDate}} | 
           <input type="checkbox" ng-model="course.Suspended">
@@ -16,7 +16,17 @@
       </form>
     </div>
     <div class="ui divider"></div>
-    <p>{{course.Description}}<span class="edit-tag">Edit</span></p>
+    <div ng-hide="editingDescription">
+      <p>{{course.Description}}<span class="edit-tag" ng-click="editDescription()">Edit</span></p>
+    </div>
+    <div ng-show="editingDescription">
+      <form class="ui form">
+        <div class="field">
+          <input type="text" name="description" placeholder="Description" ng-model="course.Description">
+        </div>
+        <button class="ui right floated blue button" type="submit" ng-click="submitDescription()">Done</button>
+      </form>
+    </div>
     <div class="ui divider"></div>
     <div><h3 style="display: inline;">Coordinator(s)</h3><span class="edit-tag">Edit</span></div>
     <table class="ui celled padded table">
