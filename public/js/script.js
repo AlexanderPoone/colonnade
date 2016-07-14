@@ -370,7 +370,7 @@ app
                 console.log("error");
                 if(callback) callback(response.data);
             });
-        }
+        },
         updateDetail: function(courseId, details, callback){
             $http.post(API_URL + "/admin/course/" + courseId + "/update", {
                 details: details,
