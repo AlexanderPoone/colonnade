@@ -331,6 +331,29 @@ func AdminUsers(s *mgo.Session, user User_t, admin string, page int) (int, []Use
     return 0, result
 }
 
+func AdminUser(s *mgo.Session, user User_t, admin, userIdHex string) (int, User_db) {
+    // check admin
+    if IsAdmin(user, admin) != 0 { return 1, User_db{} }
+
+    // check validity of courseId
+    if !bson.IsObjectIdHex(userIdHex) { return 2, User_db{} }
+    userId := bson.ObjectIdHex(userIdHex)
+
+    // query to database
+    var user_data User_db
+    err := usersCollection(s).Find(bson.M{
+        "_id": userId,
+    }).Select(bson.M{
+        "_id": 1,
+        "identifier": 1,
+        "suspended": 1,
+        "name": 1,
+    }).One(&user_data)
+
+    if err != nil { return 3, User_db{} }
+    return 0, user_data
+}
+
 func AdminNewCourse(s *mgo.Session, user User_t, admin string, course Course_t) (int, string) {
     if IsAdmin(user, admin) != 0 { return 1, "" }
 

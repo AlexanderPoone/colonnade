@@ -34,6 +34,9 @@ app
     .when('/admin/users/',{
         templateUrl:'public/template/adminUsers.html',
         controller:'adminUsersCtrl'})
+    .when('/admin/user/:Id',{
+        templateUrl:'public/template/adminUser.html',
+        controller:'adminUserCtrl'})
     .otherwise({
         templateUrl:'public/template/404.html',
         controller:'404Ctrl'});
@@ -267,6 +270,13 @@ app
         $scope.users = response.data.users;
     });
 })
+.controller("adminUserCtrl", function($scope, $routeParams, login, admin){
+    var userId = $routeParams.Id;
+    admin.getUserDetail(userId, function(response){
+        $scope.user = response.data.user;
+        console.log($scope.user);
+    });
+})
 .controller("404Ctrl", function($scope, $http, login){
 })
 .factory('login', function($http){
@@ -403,6 +413,16 @@ app
         getAllUsers: function(p, callback){
             $http.get(API_URL + "/admin/users", {
                 params: {p: p},
+                withCredentials: true,
+            }).then(function successCallback(response){
+                if(callback) callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            });
+        },
+        getUserDetail: function(userId, callback){
+            $http.get(API_URL + "/admin/user/" + userId, {
                 withCredentials: true,
             }).then(function successCallback(response){
                 if(callback) callback(response.data);
