@@ -274,7 +274,6 @@ app
     var userId = $routeParams.Id;
     admin.getUserDetail(userId, function(response){
         $scope.user = response.data.user;
-        console.log($scope.user);
     });
 })
 .controller("404Ctrl", function($scope, $http, login){
