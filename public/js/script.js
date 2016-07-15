@@ -104,7 +104,6 @@ app
 .controller("adminCtrl", function($scope){
 })
 .controller("adminCoursesCtrl", function($scope, $routeParams, login, admin){
-    $scope.page = "listCourses";
     var page = $routeParams.p ? $routeParams.p : 0 ;
     admin.getAllCourses(page, function(response){
         $scope.courses = response.data.courses;
@@ -129,7 +128,6 @@ app
         }
     }
     var newCourseId = null;
-    $scope.page = "newCourse";
     $scope.step = {};
     $scope.step.style = {};
     $scope.step.style.info = {
