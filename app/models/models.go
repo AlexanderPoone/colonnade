@@ -51,6 +51,29 @@ type Course_db struct {
     Users       []UserInCourse_db  `bson:"users,omitempty"`
     TimeCreated time.Time          `bson:"timeCreated,omitempty"`
     Id          bson.ObjectId      `bson:"_id,omitempty"`
+    Accessments []Stage_db         `bson:"accessments,omitempty"`
+}
+
+type Stage_db struct {
+    Description string      `bson:"description"`
+    Tasks       []Task_db   `bson:"tasks,omitempty"`
+}
+
+type Task_db struct {
+    Description string         `bson:"description"`
+    AllowLang   []string       `bson:"allowLang,omitempty"`
+    TestCases   []TestCase_db  `bson:"testCases,omitempty"`
+}
+
+type TestCase_db struct {
+    Stdin       string            `bson:"stdin"`
+    Stdout      OutputHandler_db  `bson:"stdout"`
+    Stderr      OutputHandler_db  `bson:"stderr"`
+}
+
+type OutputHandler_db struct {
+    HandlerType string     `bson:"handlerType"`
+    DirectComp  string     `bson:"directComp,omitempty"`
 }
 
 type AggregateUser_t struct {
