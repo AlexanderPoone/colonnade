@@ -11,7 +11,7 @@
         </div>
         Created on {{course.newDate}} | 
           <input type="checkbox" ng-model="course.Suspended">
-        <span ng-show="course.Suspended">Suspended</span><span ng-hide="course.Suspended">Active</span>
+        {{course.Suspended ? "Suspended" : "Active"}}
         <button class="ui blue button" type="submit" ng-click="submitTitleBlock()">Done</button>
       </form>
     </div>
