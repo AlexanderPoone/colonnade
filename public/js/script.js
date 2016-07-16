@@ -206,7 +206,6 @@ app
 
     $scope.editTitleBlock = function(){
         $scope.editingTitleBlock = true;
-        $('.ui.checkbox').checkbox();
     }
 
     $scope.editDescription = function(){
@@ -270,9 +269,46 @@ app
 })
 .controller("adminUserCtrl", function($scope, $routeParams, login, admin){
     var userId = $routeParams.Id;
-    admin.getUserDetail(userId, function(response){
-        $scope.user = response.data.user;
+    var originalDetail;
+    $scope.editingNameBlock = false;
+
+    admin.getUserDetail(userId, function(result){
+        originalDetail = result.data.user;
+        $scope.user = Object.assign({}, originalDetail);
     });
+
+    $scope.editNameBlock = function(){
+        $scope.editingNameBlock = true;
+    }
+
+    $scope.submitNameBlock = function(){
+        var details = [];
+        if($scope.user.Name != originalDetail.Name){
+            details.push({
+                t: "Name",
+                v: $scope.user.Name,
+            })
+        }
+        if($scope.user.Suspended != originalDetail.Suspended){
+            details.push({
+                t: "Suspended",
+                v: $scope.user.Suspended,
+            })
+        }
+
+        if(details.length){  // only do work if somewhere need to be updated
+            admin.updateUser(userId, details, function(res){
+                if(res.error == 0){
+                    originalDetail.Name = $scope.user.Name;
+                    originalDetail.Suspended = $scope.user.Suspended;
+                }else{
+                    $scope.user.Name = originalDetail.Name;
+                    $scope.user.Suspended = originalDetail.Suspended;
+                }
+            });
+        }
+        $scope.editingNameBlock = false;
+    }
 })
 .controller("404Ctrl", function($scope, $http, login){
 })
@@ -462,7 +498,19 @@ app
                 console.log("error");
                 if(callback) callback(response.data);
             })
-        }
+        },
+        updateUser: function(userId, details, callback){
+            $http.post(API_URL + "/admin/user/" + userId + "/update", {
+                d: details,
+            },{
+                withCredentials: true,
+            }).then(function successCallback(response){
+                if(callback) callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            })
+        },
     }
 })
 .directive("findUser", function(){

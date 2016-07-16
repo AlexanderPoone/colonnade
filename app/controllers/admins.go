@@ -293,6 +293,40 @@ func (c Admins) UpdateCourse(Id string) revel.Result {
     return c.RenderJson(data)
 }
 
+func (c Admins) UpdateUser(Id string) revel.Result {
+    var details models.Details_t
+    models.ParseBody(c.Request.Body, &details)
+    result, allRes := models.AdminUpdateUser(
+        c.MongoSession,
+        models.User_t{
+            Email: c.Session["email"],
+            Username: c.Session["username"],
+            Name: c.Session["name"],
+            UserIdHex: c.Session["userId"],
+        },
+        c.Session["admin"],
+        Id,
+        details,
+    )
+
+    // start with initialise response interface
+    data := make(map[string]interface{})
+    data["error"] = result
+    switch result {
+        case 0 :
+            data["message"] = "All/Part of the details have been updated"
+            data["data"] = make(map[string]interface{})
+            data["data"].(map[string]interface{})["results"] = allRes
+        case 1 :
+            data["message"] = "User is not admin"
+        case 2 :
+            data["message"] = "Course Id is not valid"
+        case 3 :
+            data["message"] = "None of the detail has been updated due to unexpected Error in Database"
+    }
+    return c.RenderJson(data)
+}
+
 func (c Admins) FindUserByIdentifier(q, s string) revel.Result {
     allowSuspend := true
     if s == "f" {allowSuspend = false}

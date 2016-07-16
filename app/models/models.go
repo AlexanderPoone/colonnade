@@ -470,6 +470,51 @@ func AdminUpdateCourse(s *mgo.Session, user User_t, admin, IdHex string, details
     return 0, indivSucc
 }
 
+func UpdateUserName(s *mgo.Session, userId bson.ObjectId, data string) int {
+    err := usersCollection(s).Update(
+        bson.M{"_id": userId},
+        bson.M{
+            "$set": bson.M{"name": data},
+        },
+    )
+    if err != nil { return 1 }
+    return 0
+}
+
+func UpdateUserSuspended(s *mgo.Session, userId bson.ObjectId, data bool) int {
+    err := usersCollection(s).Update(
+        bson.M{"_id": userId},
+        bson.M{
+            "$set": bson.M{"suspended": data},
+        },
+    )
+    if err != nil { return 1 }
+    return 0
+}
+
+func AdminUpdateUser(s *mgo.Session, user User_t, admin, IdHex string, details Details_t) (int, []int) {
+    if IsAdmin(user, admin) != 0 { return 1, []int{} }
+
+    if !bson.IsObjectIdHex(IdHex) { return 2, []int{} }
+    Id := bson.ObjectIdHex(IdHex)
+
+    var success bool = false
+    var indivSucc []int
+    for _, value := range details.Details {
+        var tempSuccess int
+        switch value.UpdateType {
+            case "Name":
+                tempSuccess = UpdateUserName(s, Id, value.UpdateValue.(string))
+            case "Suspended":
+                tempSuccess = UpdateUserSuspended(s, Id, value.UpdateValue.(bool))
+        }
+        indivSucc = append(indivSucc, tempSuccess)
+        if tempSuccess == 0 { success = true }
+    }
+    if !success { return 3, []int{} }
+    return 0, indivSucc
+}
+
 func GetUserByIdentifier(s *mgo.Session, identifier string, allowSuspend bool) (int, []User_db) {
     var result []User_db
     var query bson.M
