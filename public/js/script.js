@@ -186,7 +186,7 @@ app
         })
     });
 })
-.controller("adminCourseCtrl", function($scope, $routeParams, login, admin, ROLES){
+.controller("adminCourseCtrl", function($scope, $routeParams, login, admin, batchUpdate, ROLES){
     $scope.ROLES = ROLES;
     
     var courseId = $routeParams.Id;
@@ -230,8 +230,7 @@ app
         if(details.length){  // only do work if somewhere need to be updated
             admin.updateCourse(courseId, details, function(res){
                 if(res.error == 0){
-                    originalDetail.Name = $scope.course.Name;
-                    originalDetail.Suspended = $scope.course.Suspended;
+                    batchUpdate($scope.course, originalDetail, details, res.data.results);
                 }else{
                     $scope.course.Name = originalDetail.Name;
                     $scope.course.Suspended = originalDetail.Suspended;
@@ -252,7 +251,7 @@ app
         if(details.length){  // only do work if somewhere need to be updated
             admin.updateCourse(courseId, details, function(res){
                 if(res.error == 0){
-                    originalDetail.Description = $scope.course.Description;
+                    batchUpdate($scope.course, originalDetail, details, res.data.results);
                 }else{
                     $scope.course.Description = originalDetail.Description;
                 }
@@ -267,7 +266,7 @@ app
         $scope.users = response.data.users;
     });
 })
-.controller("adminUserCtrl", function($scope, $routeParams, login, admin){
+.controller("adminUserCtrl", function($scope, $routeParams, login, admin, batchUpdate){
     var userId = $routeParams.Id;
     var originalDetail;
     $scope.editingNameBlock = false;
@@ -299,8 +298,7 @@ app
         if(details.length){  // only do work if somewhere need to be updated
             admin.updateUser(userId, details, function(res){
                 if(res.error == 0){
-                    originalDetail.Name = $scope.user.Name;
-                    originalDetail.Suspended = $scope.user.Suspended;
+                    batchUpdate($scope.user, originalDetail, details, res.data.results);
                 }else{
                     $scope.user.Name = originalDetail.Name;
                     $scope.user.Suspended = originalDetail.Suspended;
@@ -511,6 +509,18 @@ app
                 if(callback) callback(response.data);
             })
         },
+    }
+})
+.factory("batchUpdate", function(){
+    return function(scopeData, origData, submittedData, isSuccessArray){
+        for(i in isSuccessArray){
+            var Type = submittedData[i].t;
+            if(isSuccessArray[i] == 0){
+                origData[Type] = scopeData[Type]
+            }else{
+                scopeData[Type] = origData[Type]
+            }
+        }
     }
 })
 .directive("findUser", function(){
