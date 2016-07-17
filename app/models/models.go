@@ -238,7 +238,7 @@ func CoursesForUser(s *mgo.Session, UserIdHex string) (int, []Course_db, []Cours
     err := coursesCollection(s).Find(bson.M{
         "$and": []bson.M{
             bson.M{"users.uid": UserId},
-            bson.M{"suspended": false},
+            bson.M{"suspended": bson.M{"$ne": true}},
         },
     }).Select(bson.M{
         "name": 1,
@@ -547,7 +547,7 @@ func GetUserByIdentifier(s *mgo.Session, identifier string, allowSuspend bool) (
         query = bson.M{
             "$and": []bson.M{
                 bson.M{"identifier": bson.M{"$regex": ".*" + identifier + ".*"}},
-                bson.M{"suspended": false},
+                bson.M{"suspended": bson.M{"$ne": true}},
                 },
             }
     }
