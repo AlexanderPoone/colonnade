@@ -53,13 +53,17 @@ app
 })
 .controller("mainCtrl", function($scope, $http, login){
 })
-.controller("dashboardCtrl", function($scope, $http, user){
-    $scope.courses = {};
-    user.getCoursesForUser(function(res){
-        $scope.courses.coordinator = res.data.asCoordinator;
-        $scope.courses.tutor       = res.data.asTutor;
-        $scope.courses.student     = res.data.asStudent;
-    })
+.controller("dashboardCtrl", function($scope, $http, $location, login, user){
+    if(!login.loggedIn()){
+        $location.url("/login/");
+    }else{
+        $scope.courses = {};
+        user.getCoursesForUser(function(res){
+            $scope.courses.coordinator = res.data.asCoordinator;
+            $scope.courses.tutor       = res.data.asTutor;
+            $scope.courses.student     = res.data.asStudent;
+        })
+    }
 })
 .controller("loginCtrl", function($scope, $location, login, register){
     $scope.login = function() {
@@ -316,7 +320,7 @@ app
 })
 .controller("404Ctrl", function($scope, $http, login){
 })
-.factory('login', function($http){
+.factory('login', function($http, $location){
     var user = {};
     user.loggedIn = false;
     user.name = "";
@@ -391,7 +395,10 @@ app
                 console.log("error");
                 if(callback) callback(response.data);
             });
-        }
+        },
+        loggedIn: function(){
+            return user.loggedIn;
+        },
     }
 })
 .factory('register', function($http){
