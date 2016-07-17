@@ -243,7 +243,7 @@ func CoursesForUser(s *mgo.Session, UserIdHex string) (int, []Course_db, []Cours
     }).Select(bson.M{
         "name": 1,
         "description": 1,
-        "users": bson.M{"$elemMatch":bson.M{"$eq":UserId}},
+        "users": bson.M{"$elemMatch":bson.M{"uid":UserId}},
         "_id": 1,
     }).All(&result)
     if err != nil { return 3, []Course_db{}, []Course_db{}, []Course_db{} }
