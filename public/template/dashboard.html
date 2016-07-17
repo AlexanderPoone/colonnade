@@ -1,0 +1,14 @@
+<div class="content-wrapper">
+  <div class="ui container">
+    <h1>Subject which you are a ...</h1>
+    <div class="ui divider"></div>
+    <h2>Coordinator</h2>
+    <p ng-repeat="course in courses.coordinator"><a ng-href="./#/course/{{course.Id}}">{{course.Name}}</a></p>
+    <div class="ui divider"></div>
+    <h2>Tutor</h2>
+    <p ng-repeat="course in courses.tutor"><a ng-href="./#/course/{{course.Id}}">{{course.Name}}</a></p>
+    <div class="ui divider"></div>
+    <h2>Student</h2>
+    <p ng-repeat="course in courses.student"><a ng-href="./#/course/{{course.Id}}">{{course.Name}}</a></p>
+  </div>
+</div>

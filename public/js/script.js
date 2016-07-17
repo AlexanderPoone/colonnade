@@ -53,7 +53,13 @@ app
 })
 .controller("mainCtrl", function($scope, $http, login){
 })
-.controller("dashboardCtrl", function($scope, $http, login){
+.controller("dashboardCtrl", function($scope, $http, user){
+    $scope.courses = {};
+    user.getCoursesForUser(function(res){
+        $scope.courses.coordinator = res.data.asCoordinator;
+        $scope.courses.tutor       = res.data.asTutor;
+        $scope.courses.student     = res.data.asStudent;
+    })
 })
 .controller("loginCtrl", function($scope, $location, login, register){
     $scope.login = function() {
@@ -403,6 +409,20 @@ app
             console.log("error");
             if(callback) callback(response.data);
         });
+    }
+})
+.factory('user', function($http){
+    return {
+        getCoursesForUser: function(callback){
+            $http.get(API_URL + "/courses", {
+                withCredentials: true,
+            }).then(function successCallback(response){
+                callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            })
+        },
     }
 })
 .factory('admin', function($http, login){
