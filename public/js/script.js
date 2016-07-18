@@ -605,7 +605,7 @@ app
         scope.add = function(user){
             new_user = {};
             new_user.Id = user.Id;
-            new_user.Email = user.Email;
+            new_user.Identifier = user.Identifier;
             new_user.Name = user.Name;
             scope.chosen.push(new_user);
             scope.query = "";
@@ -653,9 +653,9 @@ app
         }
         scope.removeUser = function(user){
             var tempUser = {
-                Id    : user.Id,
-                Email : user.Email,
-                Name  : user.Name,
+                Id         : user.Id,
+                Identifier : user.Suspended,
+                Name       : user.Name,
             };
 
             pending.removed.push(tempUser);
@@ -665,9 +665,9 @@ app
         scope.addUser = function(users){
             for(i in users){
                 var tempUser = {
-                    Id    : users[i].Id,
-                    Email : users[i].Email,
-                    Name  : users[i].Name,
+                    Id         : users[i].Id,
+                    Identifier : users[i].Identifier,
+                    Name       : users[i].Name,
                 };
 
                 pending.added.push(tempUser);
