@@ -269,6 +269,10 @@ app
         }
         $scope.editingDescription = false;
     }
+
+    $scope.updateCoordinators = function(){
+        console.log($scope.coordinatorsData);
+    }
 })
 .controller("adminUsersCtrl", function($scope, $routeParams, login, admin){
     var page = $routeParams.p ? $routeParams.p : 0 ;
@@ -654,10 +658,10 @@ app
         }
         scope.removeUser = function(user){
             var tempUser = {
-                Id         : user.Id,
-                Identifier : user.Suspended,
-                Name       : user.Name,
-                Suspended  : user.Suspended,
+                Id         : user.Detail.Id,
+                Identifier : user.Detail.Identifier,
+                Name       : user.Detail.Name,
+                Suspended  : user.Detail.Suspended,
             };
 
             pending.removed.push(tempUser);
@@ -675,6 +679,7 @@ app
 
                 pending.added.push(tempUser);
             }
+            scope.findUserData.chosen = [];
 
             ngModelCtrl.$setViewValue(pending);
         }
@@ -703,10 +708,11 @@ app
         require: "ngModel",
         templateUrl: "public/template/listEditUser.html",
         scope: {
-            users: "=ngModel",
+            users: "=",
             role: "=",
             title: "@",
             update: "&",
+            ngModel: "=",
         },
         link: link,
     }
