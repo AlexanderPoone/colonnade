@@ -34,6 +34,9 @@ app
     .when('/admin/users/',{
         templateUrl:'public/template/adminUsers.html',
         controller:'adminUsersCtrl'})
+    .when('/admin/user/:Id',{
+        templateUrl:'public/template/adminUser.html',
+        controller:'adminUserCtrl'})
     .otherwise({
         templateUrl:'public/template/404.html',
         controller:'404Ctrl'});
@@ -50,7 +53,17 @@ app
 })
 .controller("mainCtrl", function($scope, $http, login){
 })
-.controller("dashboardCtrl", function($scope, $http, login){
+.controller("dashboardCtrl", function($scope, $http, $location, login, user){
+    if(!login.loggedIn()){
+        $location.url("/login/");
+    }else{
+        $scope.courses = {};
+        user.getCoursesForUser(function(res){
+            $scope.courses.coordinator = res.data.asCoordinator;
+            $scope.courses.tutor       = res.data.asTutor;
+            $scope.courses.student     = res.data.asStudent;
+        })
+    }
 })
 .controller("loginCtrl", function($scope, $location, login, register){
     $scope.login = function() {
@@ -101,7 +114,6 @@ app
 .controller("adminCtrl", function($scope){
 })
 .controller("adminCoursesCtrl", function($scope, $routeParams, login, admin){
-    $scope.page = "listCourses";
     var page = $routeParams.p ? $routeParams.p : 0 ;
     admin.getAllCourses(page, function(response){
         $scope.courses = response.data.courses;
@@ -126,7 +138,6 @@ app
         }
     }
     var newCourseId = null;
-    $scope.page = "newCourse";
     $scope.step = {};
     $scope.step.style = {};
     $scope.step.style.info = {
@@ -185,18 +196,79 @@ app
         })
     });
 })
-.controller("adminCourseCtrl", function($scope, $routeParams, login, admin, ROLES){
+.controller("adminCourseCtrl", function($scope, $routeParams, login, admin, batchUpdate, ROLES){
     $scope.ROLES = ROLES;
     
-    admin.getCourseDetail($routeParams.Id, function(result){
+    var courseId = $routeParams.Id;
+    var originalDetail;
+    $scope.editingTitleBlock = false;
+
+    admin.getCourseDetail(courseId, function(result){
         if(result.error == 0){
-            $scope.course = result.data.course;
+            originalDetail = result.data.course;
+            $scope.course = Object.assign({}, originalDetail);
             var tempDate = new Date($scope.course.TimeCreated);
             $scope.course.newDate = tempDate.getDate().toString() + '/' +
                                     (tempDate.getMonth() + 1).toString() + '/' +
                                     tempDate.getFullYear().toString();
         }
     });
+
+    $scope.editTitleBlock = function(){
+        $scope.editingTitleBlock = true;
+    }
+
+    $scope.editDescription = function(){
+        $scope.editingDescription = true;
+    }
+
+    $scope.submitTitleBlock = function(){
+        var details = [];
+        if($scope.course.Name != originalDetail.Name){
+            details.push({
+                t: "Name",
+                v: $scope.course.Name,
+            })
+        }
+        if($scope.course.Suspended != originalDetail.Suspended){
+            details.push({
+                t: "Suspended",
+                v: $scope.course.Suspended,
+            })
+        }
+
+        if(details.length){  // only do work if somewhere need to be updated
+            admin.updateCourse(courseId, details, function(res){
+                if(res.error == 0){
+                    batchUpdate($scope.course, originalDetail, details, res.data.results);
+                }else{
+                    $scope.course.Name = originalDetail.Name;
+                    $scope.course.Suspended = originalDetail.Suspended;
+                }
+            });
+        }
+        $scope.editingTitleBlock = false;
+    }
+
+    $scope.submitDescription = function(){
+        var details = [];
+        if($scope.course.Description != originalDetail.Description){
+            details.push({
+                t: "Description",
+                v: $scope.course.Description,
+            })
+        }
+        if(details.length){  // only do work if somewhere need to be updated
+            admin.updateCourse(courseId, details, function(res){
+                if(res.error == 0){
+                    batchUpdate($scope.course, originalDetail, details, res.data.results);
+                }else{
+                    $scope.course.Description = originalDetail.Description;
+                }
+            });
+        }
+        $scope.editingDescription = false;
+    }
 })
 .controller("adminUsersCtrl", function($scope, $routeParams, login, admin){
     var page = $routeParams.p ? $routeParams.p : 0 ;
@@ -204,9 +276,51 @@ app
         $scope.users = response.data.users;
     });
 })
+.controller("adminUserCtrl", function($scope, $routeParams, login, admin, batchUpdate){
+    var userId = $routeParams.Id;
+    var originalDetail;
+    $scope.editingNameBlock = false;
+
+    admin.getUserDetail(userId, function(result){
+        originalDetail = result.data.user;
+        $scope.user = Object.assign({}, originalDetail);
+    });
+
+    $scope.editNameBlock = function(){
+        $scope.editingNameBlock = true;
+    }
+
+    $scope.submitNameBlock = function(){
+        var details = [];
+        if($scope.user.Name != originalDetail.Name){
+            details.push({
+                t: "Name",
+                v: $scope.user.Name,
+            })
+        }
+        if($scope.user.Suspended != originalDetail.Suspended){
+            details.push({
+                t: "Suspended",
+                v: $scope.user.Suspended,
+            })
+        }
+
+        if(details.length){  // only do work if somewhere need to be updated
+            admin.updateUser(userId, details, function(res){
+                if(res.error == 0){
+                    batchUpdate($scope.user, originalDetail, details, res.data.results);
+                }else{
+                    $scope.user.Name = originalDetail.Name;
+                    $scope.user.Suspended = originalDetail.Suspended;
+                }
+            });
+        }
+        $scope.editingNameBlock = false;
+    }
+})
 .controller("404Ctrl", function($scope, $http, login){
 })
-.factory('login', function($http){
+.factory('login', function($http, $location){
     var user = {};
     user.loggedIn = false;
     user.name = "";
@@ -281,7 +395,10 @@ app
                 console.log("error");
                 if(callback) callback(response.data);
             });
-        }
+        },
+        loggedIn: function(){
+            return user.loggedIn;
+        },
     }
 })
 .factory('register', function($http){
@@ -299,6 +416,20 @@ app
             console.log("error");
             if(callback) callback(response.data);
         });
+    }
+})
+.factory('user', function($http){
+    return {
+        getCoursesForUser: function(callback){
+            $http.get(API_URL + "/courses", {
+                withCredentials: true,
+            }).then(function successCallback(response){
+                callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            })
+        },
     }
 })
 .factory('admin', function($http, login){
@@ -320,7 +451,7 @@ app
             }).then(function successCallback(response){
                 if(callback) callback(response.data);
             }, function errorCallback(response){
-                console.log(response);
+                console.log("error");
                 if(callback) callback(response.data);
             });
         },
@@ -340,6 +471,16 @@ app
         getAllUsers: function(p, callback){
             $http.get(API_URL + "/admin/users", {
                 params: {p: p},
+                withCredentials: true,
+            }).then(function successCallback(response){
+                if(callback) callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            });
+        },
+        getUserDetail: function(userId, callback){
+            $http.get(API_URL + "/admin/user/" + userId, {
                 withCredentials: true,
             }).then(function successCallback(response){
                 if(callback) callback(response.data);
@@ -370,6 +511,42 @@ app
                 console.log("error");
                 if(callback) callback(response.data);
             });
+        },
+        updateCourse: function(courseId, details, callback){
+            $http.post(API_URL + "/admin/course/" + courseId + "/update", {
+                d: details,
+            },{
+                withCredentials: true,
+            }).then(function successCallback(response){
+                if(callback) callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            })
+        },
+        updateUser: function(userId, details, callback){
+            $http.post(API_URL + "/admin/user/" + userId + "/update", {
+                d: details,
+            },{
+                withCredentials: true,
+            }).then(function successCallback(response){
+                if(callback) callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            })
+        },
+    }
+})
+.factory("batchUpdate", function(){
+    return function(scopeData, origData, submittedData, isSuccessArray){
+        for(i in isSuccessArray){
+            var Type = submittedData[i].t;
+            if(isSuccessArray[i] == 0){
+                origData[Type] = scopeData[Type]
+            }else{
+                scopeData[Type] = origData[Type]
+            }
         }
     }
 })

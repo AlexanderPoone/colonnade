@@ -1,0 +1,21 @@
+<div class="content-wrapper">
+  <div class="ui container">
+    <h1>Username: {{user.Identifier[1]}}</h1>
+    <p>Email: {{user.Identifier[0]}}</p>
+    <div class="ui divider"></div>
+    <div ng-hide="editingNameBlock">
+      <p>{{user.Name}}</p>
+      <p style="display: inline;">{{user.Suspended ? 'Suspended' : 'Active'}}</p><span class="edit-tag" ng-click="editNameBlock()">Edit</span>
+    </div>
+    <div ng-show="editingNameBlock">
+      <form class="ui form">
+        <div class="field">
+          <input type="text" name="name" placeholder="Name" ng-model="user.Name">
+        </div>
+        <input type="checkbox" ng-model="user.Suspended">
+        {{user.Suspended ? "Suspended" : "Active"}}
+        <button class="ui blue button" type="submit" ng-click="submitNameBlock()">Done</button>
+      </form>
+    </div>
+  </div>
+</div>
