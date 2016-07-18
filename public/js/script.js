@@ -642,14 +642,41 @@ app
 })
 .directive('listEditUser', function(admin){
     function link(scope, elem, attrs, ngModelCtrl){
+        var pending = {
+            removed: [],
+            added  : [],
+        };
+
         scope.edit = false;
         scope.editMode = function(){
             scope.edit=true;
         }
         scope.removeUser = function(user){
+            var tempUser = {
+                Id    : user.Id,
+                Email : user.Email,
+                Name  : user.Name,
+            };
+
+            pending.removed.push(tempUser);
+            ngModelCtrl.$setViewValue(pending);
             scope.users.pop(user);
         }
+        scope.addUser = function(users){
+            for(i in users){
+                var tempUser = {
+                    Id    : users[i].Id,
+                    Email : users[i].Email,
+                    Name  : users[i].Name,
+                };
+
+                pending.added.push(tempUser);
+            }
+
+            ngModelCtrl.$setViewValue(pending);
+        }
         scope.submitChange = function(){
+            scope.update();
             viewMode();
         }
         scope.changeData = function(findUserData){
@@ -676,6 +703,7 @@ app
             users: "=ngModel",
             role: "=",
             title: "@",
+            update: "&",
         },
         link: link,
     }
