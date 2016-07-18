@@ -1,5 +1,4 @@
 var app = angular.module("Colonnade", ['ngRoute', 'ngCookies'])
-var API_URL = './api';
 
 var email_regex = /^[a-z0-9._%+-]+@(?:[a-z0-9-]+\.)+[a-z]{2,4}$/;
 var password_regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/;
@@ -324,7 +323,7 @@ app
 })
 .controller("404Ctrl", function($scope, $http, login){
 })
-.factory('login', function($http, $location){
+.factory('login', function($http, $location, API){
     var user = {};
     user.loggedIn = false;
     user.name = "";
@@ -332,7 +331,7 @@ app
     user.admin = false;
     var globScope = null;
     var checkLogin = function(callback){
-        $http.get(API_URL + '/user/loginInfo', {
+        $http.get(API.url + '/user/loginInfo', {
             withCredentials: true,
         }).then(function successCallback(response) {
             if(response.data.error == 0){
@@ -360,7 +359,7 @@ app
             checkLogin();
         },
         launch: function(email, password, callback){
-            $http.post(API_URL + '/user/login', {
+            $http.post(API.url + '/user/login', {
                 email: email,
                 password: password
             }, {
@@ -384,7 +383,7 @@ app
         },
         checkLogin: checkLogin,
         logout: function(callback){
-            $http.get(API_URL + '/user/logout', {
+            $http.get(API.url + '/user/logout', {
                 withCredentials: true,
             }).then(function successCallback(response) {
                 if(response.data.error == 0){
@@ -405,9 +404,9 @@ app
         },
     }
 })
-.factory('register', function($http){
+.factory('register', function($http, API){
     return function(email, username, name, password, callback){
-        $http.post(API_URL + '/user/register', {
+        $http.post(API.url + '/user/register', {
             email: email,
             password: password,
             name: name,
@@ -422,10 +421,10 @@ app
         });
     }
 })
-.factory('user', function($http){
+.factory('user', function($http, API){
     return {
         getCoursesForUser: function(callback){
-            $http.get(API_URL + "/courses", {
+            $http.get(API.url + "/courses", {
                 withCredentials: true,
             }).then(function successCallback(response){
                 callback(response.data);
@@ -436,10 +435,10 @@ app
         },
     }
 })
-.factory('admin', function($http, login){
+.factory('admin', function($http, API, login){
     return {
         getAllCourses: function(p, callback){
-            $http.get(API_URL + "/admin/courses", {
+            $http.get(API.url + "/admin/courses", {
                 params: {p: p},
                 withCredentials: true,
             }).then(function successCallback(response){
@@ -450,7 +449,7 @@ app
             });
         },
         getCourseDetail: function(courseId, callback){
-            $http.get(API_URL + "/admin/course/" + courseId, {
+            $http.get(API.url + "/admin/course/" + courseId, {
                 withCredentials: true,
             }).then(function successCallback(response){
                 if(callback) callback(response.data);
@@ -460,7 +459,7 @@ app
             });
         },
         createNewCourse: function(name, description, callback){
-            $http.post(API_URL + "/admin/course/new", {
+            $http.post(API.url + "/admin/course/new", {
                 name: name,
                 description: description,
             }, {
@@ -473,7 +472,7 @@ app
             })
         },
         getAllUsers: function(p, callback){
-            $http.get(API_URL + "/admin/users", {
+            $http.get(API.url + "/admin/users", {
                 params: {p: p},
                 withCredentials: true,
             }).then(function successCallback(response){
@@ -484,7 +483,7 @@ app
             });
         },
         getUserDetail: function(userId, callback){
-            $http.get(API_URL + "/admin/user/" + userId, {
+            $http.get(API.url + "/admin/user/" + userId, {
                 withCredentials: true,
             }).then(function successCallback(response){
                 if(callback) callback(response.data);
@@ -494,7 +493,7 @@ app
             });
         },
         addUsers2Course: function(courseId, users, callback){
-            $http.post(API_URL + "/admin/course/" + courseId + "/addUsers",{
+            $http.post(API.url + "/admin/course/" + courseId + "/addUsers",{
                 users: users,
             }, {
                 withCredentials: true,
@@ -506,7 +505,7 @@ app
             })
         },
         findUserByIdentifier: function(identifier, callback){
-            $http.get(API_URL + "/admin/findUser", {
+            $http.get(API.url + "/admin/findUser", {
                 params: {q: identifier},
                 withCredentials: true,
             }).then(function successCallback(response){
@@ -517,7 +516,7 @@ app
             });
         },
         updateCourse: function(courseId, details, callback){
-            $http.post(API_URL + "/admin/course/" + courseId + "/update", {
+            $http.post(API.url + "/admin/course/" + courseId + "/update", {
                 d: details,
             },{
                 withCredentials: true,
@@ -529,7 +528,7 @@ app
             })
         },
         updateUser: function(userId, details, callback){
-            $http.post(API_URL + "/admin/user/" + userId + "/update", {
+            $http.post(API.url + "/admin/user/" + userId + "/update", {
                 d: details,
             },{
                 withCredentials: true,
@@ -729,7 +728,8 @@ app
         link: link,
     }
 })
-.constant('ROLES', {COORDINATOR: 0, TUTOR: 1, STUDENT: 2});
+.constant('ROLES', {COORDINATOR: 0, TUTOR: 1, STUDENT: 2})
+.constant('API', {url: './api'});
 
 $('#menu-button').click(function() {
     $('.ui.sidebar').sidebar('toggle');
