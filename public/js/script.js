@@ -607,6 +607,7 @@ app
             new_user.Id = user.Id;
             new_user.Identifier = user.Identifier;
             new_user.Name = user.Name;
+            new_user.Suspended = user.Suspended;
             scope.chosen.push(new_user);
             scope.query = "";
             updateQueryBox(scope.query);
@@ -656,6 +657,7 @@ app
                 Id         : user.Id,
                 Identifier : user.Suspended,
                 Name       : user.Name,
+                Suspended  : user.Suspended,
             };
 
             pending.removed.push(tempUser);
@@ -668,6 +670,7 @@ app
                     Id         : users[i].Id,
                     Identifier : users[i].Identifier,
                     Name       : users[i].Name,
+                    Suspended  : users[i].Suspended,
                 };
 
                 pending.added.push(tempUser);
