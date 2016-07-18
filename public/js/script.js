@@ -640,7 +640,7 @@ app
         link: link,
     }
 })
-.directive('listEditUser', function(){
+.directive('listEditUser', function(admin){
     function link(scope, elem, attrs, ngModelCtrl){
         scope.edit = false;
         scope.editMode = function(){
@@ -651,6 +651,16 @@ app
         }
         scope.submitChange = function(){
             viewMode();
+        }
+        scope.changeData = function(findUserData){
+            if(findUserData.query.length >= 3){
+                function add2Options(response){
+                    scope.foundUsers = response.data.users;
+                }
+                admin.findUserByIdentifier(findUserData.query, add2Options);
+            }else{
+                scope.foundUsers = null;
+            }
         }
 
         function viewMode(){

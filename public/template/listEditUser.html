@@ -1,6 +1,6 @@
 <div><h3 style="display: inline;">{{title}}</h3><span class="edit-tag" ng-hide="edit" ng-click="editMode()">Edit</span></div>
 <div ng-show="edit">
-  <find-user ng-model="adding"></find-user>
+  <find-user ng-change="changeData(findUserData)" ng-model="findUserData" options="foundUsers"></find-user>
   <button class="ui blue button">Add</button>
 </div>
 <table class="ui celled padded table">
