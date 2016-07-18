@@ -1,0 +1,19 @@
+<div><h3 style="display: inline;">{{title}}</h3><span class="edit-tag">Edit</span></div>
+<table class="ui celled padded table">
+  <thead>
+    <tr>
+      <th class="single line">Name</th>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Suspended</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="user in users | filter : {Role: role}">
+      <td class="ui center aligned"><a ng-href="./#/admin/user/{{user.Detail.Id}}">{{user.Detail.Name}}</a></td>
+      <td class="ui center aligned">{{user.Detail.Identifier[1]}}</td>
+      <td class="ui center aligned">{{user.Detail.Identifier[0]}}</td>
+      <td class="ui center aligned">{{user.Detail.Suspended}}</td>
+    </tr>
+  </tbody>
+</table>

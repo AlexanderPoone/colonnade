@@ -640,6 +640,23 @@ app
         link: link,
     }
 })
+.directive('listEditUser', function(){
+    function link(scope, elem, attrs, ngModelCtrl){
+
+    }
+
+    return {
+        restrict: "E",
+        require: "ngModel",
+        templateUrl: "public/template/listEditUser.html",
+        scope: {
+            users: "=ngModel",
+            role: "=",
+            title: "@",
+        },
+        link: link,
+    }
+})
 .constant('ROLES', {COORDINATOR: 0, TUTOR: 1, STUDENT: 2});
 
 $('#menu-button').click(function() {
