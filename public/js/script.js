@@ -1,10 +1,5 @@
 var app = angular.module("Colonnade", ['ngRoute', 'ngCookies'])
 
-var email_regex = /^[a-z0-9._%+-]+@(?:[a-z0-9-]+\.)+[a-z]{2,4}$/;
-var password_regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/;
-var username_regex = /^[a-zA-Z0-9]{2,12}$/;
-var name_regex = /^.{3,}$/;
-
 app
 .config(function ($routeProvider, $locationProvider, $httpProvider){
     $httpProvider.useApplyAsync(true);
@@ -64,7 +59,7 @@ app
         })
     }
 })
-.controller("loginCtrl", function($scope, $location, login, register){
+.controller("loginCtrl", function($scope, $location, REGEX, login, register){
     $scope.login = function() {
         login.launch($scope.loginInfo.email, $scope.loginInfo.password, function(data){
             if(data.error == 0){
@@ -79,10 +74,10 @@ app
         var ri = $scope.registerInfo;
         var invalid = {}
         if(ri){
-            invalid.email = !Boolean(ri.email ? ri.email.match(email_regex) : false);
-            invalid.username = !Boolean(ri.username ? ri.username.match(username_regex) : false);
-            invalid.name = !Boolean(ri.name ? ri.name.match(name_regex) : false);
-            invalid.password = !Boolean(ri.password ? ri.password.match(password_regex) : false);
+            invalid.email = !Boolean(ri.email ? ri.email.match(REGEX.email) : false);
+            invalid.username = !Boolean(ri.username ? ri.username.match(REGEX.username) : false);
+            invalid.name = !Boolean(ri.name ? ri.name.match(REGEX.name) : false);
+            invalid.password = !Boolean(ri.password ? ri.password.match(REGEX.password) : false);
         }else{
             invalid.email = invalid.username = invalid.name = invalid.password = true;
         }
@@ -729,7 +724,13 @@ app
     }
 })
 .constant('ROLES', {COORDINATOR: 0, TUTOR: 1, STUDENT: 2})
-.constant('API', {url: './api'});
+.constant('API', {url: './api'})
+.constant('REGEX', {
+    email    : /^[a-z0-9._%+-]+@(?:[a-z0-9-]+\.)+[a-z]{2,4}$/,
+    password : /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/,
+    username : /^[a-zA-Z0-9]{2,12}$/,
+    name     : /^.{3,}$/,
+});
 
 $('#menu-button').click(function() {
     $('.ui.sidebar').sidebar('toggle');
