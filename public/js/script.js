@@ -695,6 +695,8 @@ app
         }
         scope.submitChange = function(){
             scope.update();
+            scope.findUserData.chosen = [];
+            scope.findUserData.query  = "";
             viewMode();
         }
         scope.changeData = function(findUserData){
