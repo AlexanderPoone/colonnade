@@ -642,7 +642,20 @@ app
 })
 .directive('listEditUser', function(){
     function link(scope, elem, attrs, ngModelCtrl){
+        scope.edit = false;
+        scope.editMode = function(){
+            scope.edit=true;
+        }
+        scope.removeUser = function(user){
+            scope.users.pop(user);
+        }
+        scope.submitChange = function(){
+            viewMode();
+        }
 
+        function viewMode(){
+            scope.edit=false;
+        }
     }
 
     return {
