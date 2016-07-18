@@ -561,7 +561,12 @@ app
         scope.inputWidth = {
             width: "18px",
         }
-        scope.chosen = [];
+        if(!scope.ngModel){
+            scope.ngModel = {
+                chosen : [],
+                query  : "",
+            };
+        }
         function calcHeight(list, cooe){
             try{
                 if(list.length<=1) return (1 * cooe + 1).toString() + "px";
@@ -600,7 +605,6 @@ app
                 width: (query.length * inputCooe + 12).toString() + "px",
             }
         }
-        scope.query = "";
         scope.openSearching = function(){openSearching();}
         scope.toggleSearching = function(){
             if(!open) openSearching();
@@ -612,20 +616,20 @@ app
             new_user.Identifier = user.Identifier;
             new_user.Name = user.Name;
             new_user.Suspended = user.Suspended;
-            scope.chosen.push(new_user);
-            scope.query = "";
-            updateQueryBox(scope.query);
+            scope.ngModel.chosen.push(new_user);
+            scope.ngModel.query = "";
+            updateQueryBox(scope.ngModel.query);
             closeSearching();
         }
         scope.remove = function(user){
-            var i = scope.chosen.indexOf(user);
-            if(i > -1) scope.chosen.splice(i, 1);
+            var i = scope.ngModel.chosen.indexOf(user);
+            if(i > -1) scope.ngModel.chosen.splice(i, 1);
         }
         scope.queryChange = function(query){
             updateQueryBox(query);
         }
-        scope.$watch('chosen+query', function() {  
-            ngModelCtrl.$setViewValue({chosen: scope.chosen, query: scope.query});
+        scope.$watch('ngModel.chosen+ngModel.query', function() {
+            ngModelCtrl.$setViewValue({chosen: scope.ngModel.chosen, query: scope.ngModel.query});
         });
         scope.$watch('options', function(){
             if(open){
@@ -641,6 +645,7 @@ app
         templateUrl: 'public/template/findUser.html',
         scope: {
             options: "=",
+            ngModel: "=",
         },
         link: link,
     }
@@ -653,6 +658,7 @@ app
         };
 
         scope.edit = false;
+        scope.findUserData = {chosen: [], query: ""};
         scope.editMode = function(){
             scope.edit=true;
         }
@@ -678,6 +684,10 @@ app
                 };
 
                 pending.added.push(tempUser);
+                scope.users.push({
+                    Role   : 0,
+                    Detail : users[i],
+                });
             }
             scope.findUserData.chosen = [];
 
