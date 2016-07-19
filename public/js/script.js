@@ -265,7 +265,14 @@ app
     }
 
     $scope.updateCoordinators = function(){
-        console.log($scope.coordinatorsData);
+        var userAdding = [];
+        for(i in $scope.coordinatorsData.added){
+            userAdding.push({uid: $scope.coordinatorsData.added[i].Id, role: ROLES.COORDINATOR});
+        }
+        var userRemoving = [];
+        for(i in $scope.coordinatorsData.removed){
+            userRemoving.push($scope.coordinatorsData.removed[i].Id);
+        }
     }
 })
 .controller("adminUsersCtrl", function($scope, $routeParams, login, admin){
