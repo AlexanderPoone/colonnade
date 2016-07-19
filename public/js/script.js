@@ -499,6 +499,18 @@ app
                 if(callback) callback(response.data);
             })
         },
+        removeUsersFromCourse: function(courseId, users, callback){
+            $http.post(API.url + "/admin/course/" + courseId + "/removeUsers",{
+                users: users,
+            }, {
+                withCredentials: true,
+            }).then(function successCallback(response){
+                if(callback) callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            })
+        },
         findUserByIdentifier: function(identifier, callback){
             $http.get(API.url + "/admin/findUser", {
                 params: {q: identifier},
