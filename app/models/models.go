@@ -435,6 +435,45 @@ func AdminAddUser2Course(s *mgo.Session,
     return 0, successUsers
 }
 
+func RemoveUserFromCourse(s *mgo.Session, courseId bson.ObjectId, u []bson.ObjectId) int {
+    err := coursesCollection(s).Update(
+        bson.M{"_id": courseId},
+        bson.M{"users": bson.M{
+            "$pull": bson.M{"uid": bson.M{"$in": u}},
+        }},
+    )
+    if err != nil { return 1 }
+    return 0
+}
+
+func AdminRemoveUserFromCourse(s *mgo.Session,
+        user User_t,
+        admin string,
+        courseIdHex string,
+        UsersIdHex []string) (int, []int) {
+    
+    if IsAdmin(user, admin) != 0 { return 1, []int{} }
+    
+    if !bson.IsObjectIdHex(courseIdHex) { return 2, []int{} }
+    courseId := bson.ObjectIdHex(courseIdHex)
+
+    var successUsers []int
+    var users []bson.ObjectId
+    for _, value := range UsersIdHex {
+        if bson.IsObjectIdHex(value) {
+            successUsers = append(successUsers, 0)
+            users = append(users, bson.ObjectIdHex(value))
+        }else{
+            successUsers = append(successUsers, 1)
+        }
+    }
+
+    if len(users) == 0 { return 3, []int{} }
+    result := RemoveUserFromCourse(s, courseId, users)
+    if result != 0 { return 4, []int{} }
+    return 0, successUsers
+}
+
 func UpdateCourseName(s *mgo.Session, courseId bson.ObjectId, data string) int {
     err := coursesCollection(s).Update(
         bson.M{"_id": courseId},
