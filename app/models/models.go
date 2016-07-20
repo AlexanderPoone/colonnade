@@ -438,10 +438,11 @@ func AdminAddUser2Course(s *mgo.Session,
 func RemoveUserFromCourse(s *mgo.Session, courseId bson.ObjectId, u []bson.ObjectId) int {
     err := coursesCollection(s).Update(
         bson.M{"_id": courseId},
-        bson.M{"users": bson.M{
-            "$pull": bson.M{"uid": bson.M{"$in": u}},
+        bson.M{"$pull": bson.M{
+            "users": bson.M{"uid": bson.M{"$in": u}},
         }},
     )
+
     if err != nil { return 1 }
     return 0
 }

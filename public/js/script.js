@@ -273,6 +273,9 @@ app
         for(i in $scope.coordinatorsData.removed){
             userRemoving.push($scope.coordinatorsData.removed[i].Id);
         }
+
+        if(userAdding.length) admin.addUsers2Course(courseId, userAdding);
+        if(userRemoving.length) admin.removeUsersFromCourse(courseId, userRemoving);
     }
 })
 .controller("adminUsersCtrl", function($scope, $routeParams, login, admin){
