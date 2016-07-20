@@ -34,10 +34,7 @@ type User_t struct {
     UserIdHex  string
 }
 
-type UserInCourse_db struct {
-    Id    bson.ObjectId  `bson:"uid"`
-    Role  int            `bson:"role"`
-}
+type UserInCourse_db map[string]int
 
 type UserInCourse_t struct {
     IdHex    string      `json:"uid"`
@@ -48,7 +45,7 @@ type Course_db struct {
     Name        string             `bson:"name"`
     Description string             `bson:"description"`
     Suspended   bool               `bson:"suspended,omitempty"`
-    Users       []UserInCourse_db  `bson:"users,omitempty"`
+    Users       UserInCourse_db    `bson:"users,omitempty"`
     TimeCreated time.Time          `bson:"timeCreated,omitempty"`
     Id          bson.ObjectId      `bson:"_id,omitempty"`
     Accessments []Stage_db         `bson:"accessments,omitempty"`
@@ -232,25 +229,24 @@ func LogoutHandler(user User_t) int {
 func CoursesForUser(s *mgo.Session, UserIdHex string) (int, []Course_db, []Course_db, []Course_db) {
     isValidId := bson.IsObjectIdHex(UserIdHex)
     if !isValidId { return 2, []Course_db{}, []Course_db{}, []Course_db{} }
-    UserId := bson.ObjectIdHex(UserIdHex)
 
     var result []Course_db
     err := coursesCollection(s).Find(bson.M{
         "$and": []bson.M{
-            bson.M{"users.uid": UserId},
+            bson.M{"users." + UserIdHex: bson.M{"$exists": true}},
             bson.M{"suspended": bson.M{"$ne": true}},
         },
     }).Select(bson.M{
         "name": 1,
         "description": 1,
-        "users": bson.M{"$elemMatch":bson.M{"uid":UserId}},
+        "users." + UserIdHex: 1,
         "_id": 1,
     }).All(&result)
     if err != nil { return 3, []Course_db{}, []Course_db{}, []Course_db{} }
 
     var groups [3][]Course_db
     for _, value := range result {
-        groups[value.Users[0].Role] = append(groups[value.Users[0].Role], Course_db{
+        groups[value.Users[UserIdHex]] = append(groups[value.Users[UserIdHex]], Course_db{
                 Name: value.Name,
                 Description: value.Description,
                 Id: value.Id,
@@ -311,10 +307,10 @@ func AdminCourse(s *mgo.Session, user User_t, admin, courseIdHex string) (int, C
     }).One(&course)
 
     var aggregateUsers []AggregateUser_t
-    for _, value := range course.Users{
+    for userId, role := range course.Users{
         var user User_db
         usersCollection(s).Find(bson.M{
-            "_id": value.Id,
+            "_id": bson.ObjectIdHex(userId),
         }).Select(bson.M{
             "_id"        : 1,
             "identifier" : 1,
@@ -323,7 +319,7 @@ func AdminCourse(s *mgo.Session, user User_t, admin, courseIdHex string) (int, C
         }).One(&user)
         aggregateUsers = append(aggregateUsers, AggregateUser_t{
             Detail : user,
-            Role   : value.Role,
+            Role   : role,
         })
     }
     var aggregateCourse CourseWithUsers_t
@@ -385,7 +381,7 @@ func AdminNewCourse(s *mgo.Session, user User_t, admin string, course Course_t) 
         Name        : course.Name,
         Description : course.Description,
         Suspended   : false,
-        Users       : []UserInCourse_db{},
+        Users       : UserInCourse_db{},
         TimeCreated : time.Now(),
         Id          : id,
     }
@@ -396,12 +392,16 @@ func AdminNewCourse(s *mgo.Session, user User_t, admin string, course Course_t) 
     return 0, id.Hex()
 }
 
-func AddUser2Course(s *mgo.Session, courseId bson.ObjectId, u []UserInCourse_db) int {
-    err := coursesCollection(s).Update(
-        bson.M{"_id": courseId},
-        bson.M{"$addToSet": bson.M{"users": bson.M{"$each": u}}},
-    )
-    if err != nil { return 1 }
+func AddUser2Course(s *mgo.Session, courseId bson.ObjectId, u UserInCourse_db) int {
+    fault := false
+    for userId, role := range u{
+        err := coursesCollection(s).Update(
+            bson.M{"_id": courseId},
+            bson.M{"$set": bson.M{"users." + userId: role}},
+        )
+        if err != nil { fault = true }
+    }
+    if fault { return 1 }
     return 0
 }
 
@@ -416,14 +416,11 @@ func AdminAddUser2Course(s *mgo.Session,
     courseId := bson.ObjectIdHex(courseIdHex)
 
     var successUsers []int
-    var users []UserInCourse_db
+    users := make(UserInCourse_db)
     for _, value := range c {
         if bson.IsObjectIdHex(value.IdHex) && value.Role >= COODRINATORS && value.Role <= STUDENTS {
             successUsers = append(successUsers, 0)
-            users = append(users, UserInCourse_db{
-                Id:   bson.ObjectIdHex(value.IdHex),
-                Role: value.Role,
-            })
+            users[value.IdHex] = value.Role
         }else{
             successUsers = append(successUsers, 1)
         }
