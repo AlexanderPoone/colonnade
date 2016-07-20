@@ -713,6 +713,10 @@ app
         scope.editMode = function(){
             scope.edit=true;
         }
+        function remove(scope, user){
+            scope.users = scope.users.slice(0,scope.users.indexOf(user))
+                            .concat(scope.users.slice(scope.users.indexOf(user)+1));
+        }
         scope.removeUser = function(user){
             var tempUser = {
                 Id         : user.Detail.Id,
@@ -723,7 +727,7 @@ app
 
             pending.removed.push(tempUser);
             ngModelCtrl.$setViewValue(pending);
-            scope.users.pop(user);
+            remove(scope, user);
         }
         scope.addUser = function(users){
             for(i in users){
