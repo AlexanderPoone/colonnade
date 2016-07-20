@@ -264,11 +264,13 @@ app
         $scope.editingDescription = false;
     }
 
+    $scope.coordinatorsData = {};
     $scope.updateCoordinators = function(){
         var userAdding = [];
         for(i in $scope.coordinatorsData.added){
             userAdding.push({uid: $scope.coordinatorsData.added[i].Id, role: ROLES.COORDINATOR});
         }
+        
         var userRemoving = [];
         for(i in $scope.coordinatorsData.removed){
             userRemoving.push($scope.coordinatorsData.removed[i].Id);
@@ -278,6 +280,7 @@ app
         if(userRemoving.length) admin.removeUsersFromCourse(courseId, userRemoving);
     }
 
+    $scope.tutorsData = {};
     $scope.updateTutors = function(){
         var userAdding = [];
         for(i in $scope.tutorsData.added){
@@ -292,6 +295,7 @@ app
         if(userRemoving.length) admin.removeUsersFromCourse(courseId, userRemoving);
     }
 
+    $scope.studentsData = {};
     $scope.updateStudents = function(){
         var userAdding = [];
         for(i in $scope.studentsData.added){
