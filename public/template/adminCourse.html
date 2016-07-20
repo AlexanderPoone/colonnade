@@ -30,8 +30,8 @@
     <div class="ui divider"></div>
     <list-edit-user users="course.Users" role="ROLES.COORDINATOR" title="Coordinator(s)" update="updateCoordinators()" ng-model="coordinatorsData"></list-edit-user>
     <div class="ui divider"></div>
-    <list-edit-user users="course.Users" role="ROLES.TUTOR" title="Tutor(s)" ng-model="tutorsData"></list-edit-user>
+    <list-edit-user users="course.Users" role="ROLES.TUTOR" title="Tutor(s)" update="updateTutors()" ng-model="tutorsData"></list-edit-user>
     <div class="ui divider"></div>
-    <list-edit-user users="course.Users" role="ROLES.STUDENT" title="Student(s)" ng-model="studentsData"></list-edit-user>
+    <list-edit-user users="course.Users" role="ROLES.STUDENT" title="Student(s)" update="updateStudents()" ng-model="studentsData"></list-edit-user>
   </div>
 </div>

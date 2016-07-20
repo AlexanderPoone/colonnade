@@ -277,6 +277,34 @@ app
         if(userAdding.length) admin.addUsers2Course(courseId, userAdding);
         if(userRemoving.length) admin.removeUsersFromCourse(courseId, userRemoving);
     }
+
+    $scope.updateTutors = function(){
+        var userAdding = [];
+        for(i in $scope.tutorsData.added){
+            userAdding.push({uid: $scope.tutorsData.added[i].Id, role: ROLES.TUTOR});
+        }
+        var userRemoving = [];
+        for(i in $scope.tutorsData.removed){
+            userRemoving.push($scope.tutorsData.removed[i].Id);
+        }
+
+        if(userAdding.length) admin.addUsers2Course(courseId, userAdding);
+        if(userRemoving.length) admin.removeUsersFromCourse(courseId, userRemoving);
+    }
+
+    $scope.updateStudents = function(){
+        var userAdding = [];
+        for(i in $scope.studentsData.added){
+            userAdding.push({uid: $scope.studentsData.added[i].Id, role: ROLES.STUDENT});
+        }
+        var userRemoving = [];
+        for(i in $scope.studentsData.removed){
+            userRemoving.push($scope.studentsData.removed[i].Id);
+        }
+
+        if(userAdding.length) admin.addUsers2Course(courseId, userAdding);
+        if(userRemoving.length) admin.removeUsersFromCourse(courseId, userRemoving);
+    }
 })
 .controller("adminUsersCtrl", function($scope, $routeParams, login, admin){
     var page = $routeParams.p ? $routeParams.p : 0 ;
@@ -704,7 +732,7 @@ app
 
                 pending.added.push(tempUser);
                 scope.users.push({
-                    Role   : 0,
+                    Role   : scope.role,
                     Detail : users[i],
                 });
             }
