@@ -457,6 +457,9 @@ app
             $http.get(API.url + "/admin/course/" + courseId, {
                 withCredentials: true,
             }).then(function successCallback(response){
+                if(response.data.data.course.Users === null){
+                    response.data.data.course.Users = [];
+                }
                 if(callback) callback(response.data);
             }, function errorCallback(response){
                 console.log("error");
