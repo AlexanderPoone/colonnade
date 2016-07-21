@@ -1,10 +1,4 @@
 var app = angular.module("Colonnade", ['ngRoute', 'ngCookies'])
-var API_URL = './api';
-
-var email_regex = /^[a-z0-9._%+-]+@(?:[a-z0-9-]+\.)+[a-z]{2,4}$/;
-var password_regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/;
-var username_regex = /^[a-zA-Z0-9]{2,12}$/;
-var name_regex = /^.{3,}$/;
 
 app
 .config(function ($routeProvider, $locationProvider, $httpProvider){
@@ -65,7 +59,7 @@ app
         })
     }
 })
-.controller("loginCtrl", function($scope, $location, login, register){
+.controller("loginCtrl", function($scope, $location, REGEX, login, register){
     $scope.login = function() {
         login.launch($scope.loginInfo.email, $scope.loginInfo.password, function(data){
             if(data.error == 0){
@@ -80,10 +74,10 @@ app
         var ri = $scope.registerInfo;
         var invalid = {}
         if(ri){
-            invalid.email = !Boolean(ri.email ? ri.email.match(email_regex) : false);
-            invalid.username = !Boolean(ri.username ? ri.username.match(username_regex) : false);
-            invalid.name = !Boolean(ri.name ? ri.name.match(name_regex) : false);
-            invalid.password = !Boolean(ri.password ? ri.password.match(password_regex) : false);
+            invalid.email = !Boolean(ri.email ? ri.email.match(REGEX.email) : false);
+            invalid.username = !Boolean(ri.username ? ri.username.match(REGEX.username) : false);
+            invalid.name = !Boolean(ri.name ? ri.name.match(REGEX.name) : false);
+            invalid.password = !Boolean(ri.password ? ri.password.match(REGEX.password) : false);
         }else{
             invalid.email = invalid.username = invalid.name = invalid.password = true;
         }
@@ -269,6 +263,52 @@ app
         }
         $scope.editingDescription = false;
     }
+
+    $scope.coordinatorsData = {};
+    $scope.updateCoordinators = function(callback){
+        var userAdding = [];
+        for(i in $scope.coordinatorsData.added){
+            userAdding.push({uid: $scope.coordinatorsData.added[i].Id, role: ROLES.COORDINATOR});
+        }
+        
+        var userRemoving = [];
+        for(i in $scope.coordinatorsData.removed){
+            userRemoving.push($scope.coordinatorsData.removed[i].Id);
+        }
+
+        if(userAdding.length) admin.addUsers2Course(courseId, userAdding, callback);
+        if(userRemoving.length) admin.removeUsersFromCourse(courseId, userRemoving, callback);
+    }
+
+    $scope.tutorsData = {};
+    $scope.updateTutors = function(callback){
+        var userAdding = [];
+        for(i in $scope.tutorsData.added){
+            userAdding.push({uid: $scope.tutorsData.added[i].Id, role: ROLES.TUTOR});
+        }
+        var userRemoving = [];
+        for(i in $scope.tutorsData.removed){
+            userRemoving.push($scope.tutorsData.removed[i].Id);
+        }
+
+        if(userAdding.length) admin.addUsers2Course(courseId, userAdding, callback);
+        if(userRemoving.length) admin.removeUsersFromCourse(courseId, userRemoving, callback);
+    }
+
+    $scope.studentsData = {};
+    $scope.updateStudents = function(callback){
+        var userAdding = [];
+        for(i in $scope.studentsData.added){
+            userAdding.push({uid: $scope.studentsData.added[i].Id, role: ROLES.STUDENT});
+        }
+        var userRemoving = [];
+        for(i in $scope.studentsData.removed){
+            userRemoving.push($scope.studentsData.removed[i].Id);
+        }
+
+        if(userAdding.length) admin.addUsers2Course(courseId, userAdding, callback);
+        if(userRemoving.length) admin.removeUsersFromCourse(courseId, userRemoving, callback);
+    }
 })
 .controller("adminUsersCtrl", function($scope, $routeParams, login, admin){
     var page = $routeParams.p ? $routeParams.p : 0 ;
@@ -320,7 +360,7 @@ app
 })
 .controller("404Ctrl", function($scope, $http, login){
 })
-.factory('login', function($http, $location){
+.factory('login', function($http, $location, API){
     var user = {};
     user.loggedIn = false;
     user.name = "";
@@ -328,7 +368,7 @@ app
     user.admin = false;
     var globScope = null;
     var checkLogin = function(callback){
-        $http.get(API_URL + '/user/loginInfo', {
+        $http.get(API.url + '/user/loginInfo', {
             withCredentials: true,
         }).then(function successCallback(response) {
             if(response.data.error == 0){
@@ -356,7 +396,7 @@ app
             checkLogin();
         },
         launch: function(email, password, callback){
-            $http.post(API_URL + '/user/login', {
+            $http.post(API.url + '/user/login', {
                 email: email,
                 password: password
             }, {
@@ -380,7 +420,7 @@ app
         },
         checkLogin: checkLogin,
         logout: function(callback){
-            $http.get(API_URL + '/user/logout', {
+            $http.get(API.url + '/user/logout', {
                 withCredentials: true,
             }).then(function successCallback(response) {
                 if(response.data.error == 0){
@@ -401,9 +441,9 @@ app
         },
     }
 })
-.factory('register', function($http){
+.factory('register', function($http, API){
     return function(email, username, name, password, callback){
-        $http.post(API_URL + '/user/register', {
+        $http.post(API.url + '/user/register', {
             email: email,
             password: password,
             name: name,
@@ -418,10 +458,10 @@ app
         });
     }
 })
-.factory('user', function($http){
+.factory('user', function($http, API){
     return {
         getCoursesForUser: function(callback){
-            $http.get(API_URL + "/courses", {
+            $http.get(API.url + "/courses", {
                 withCredentials: true,
             }).then(function successCallback(response){
                 callback(response.data);
@@ -432,10 +472,10 @@ app
         },
     }
 })
-.factory('admin', function($http, login){
+.factory('admin', function($http, API, login){
     return {
         getAllCourses: function(p, callback){
-            $http.get(API_URL + "/admin/courses", {
+            $http.get(API.url + "/admin/courses", {
                 params: {p: p},
                 withCredentials: true,
             }).then(function successCallback(response){
@@ -446,9 +486,12 @@ app
             });
         },
         getCourseDetail: function(courseId, callback){
-            $http.get(API_URL + "/admin/course/" + courseId, {
+            $http.get(API.url + "/admin/course/" + courseId, {
                 withCredentials: true,
             }).then(function successCallback(response){
+                if(response.data.data.course.Users === null){
+                    response.data.data.course.Users = [];
+                }
                 if(callback) callback(response.data);
             }, function errorCallback(response){
                 console.log("error");
@@ -456,7 +499,7 @@ app
             });
         },
         createNewCourse: function(name, description, callback){
-            $http.post(API_URL + "/admin/course/new", {
+            $http.post(API.url + "/admin/course/new", {
                 name: name,
                 description: description,
             }, {
@@ -469,7 +512,7 @@ app
             })
         },
         getAllUsers: function(p, callback){
-            $http.get(API_URL + "/admin/users", {
+            $http.get(API.url + "/admin/users", {
                 params: {p: p},
                 withCredentials: true,
             }).then(function successCallback(response){
@@ -480,7 +523,7 @@ app
             });
         },
         getUserDetail: function(userId, callback){
-            $http.get(API_URL + "/admin/user/" + userId, {
+            $http.get(API.url + "/admin/user/" + userId, {
                 withCredentials: true,
             }).then(function successCallback(response){
                 if(callback) callback(response.data);
@@ -490,7 +533,19 @@ app
             });
         },
         addUsers2Course: function(courseId, users, callback){
-            $http.post(API_URL + "/admin/course/" + courseId + "/addUsers",{
+            $http.post(API.url + "/admin/course/" + courseId + "/addUsers",{
+                users: users,
+            }, {
+                withCredentials: true,
+            }).then(function successCallback(response){
+                if(callback) callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            })
+        },
+        removeUsersFromCourse: function(courseId, users, callback){
+            $http.post(API.url + "/admin/course/" + courseId + "/removeUsers",{
                 users: users,
             }, {
                 withCredentials: true,
@@ -502,7 +557,7 @@ app
             })
         },
         findUserByIdentifier: function(identifier, callback){
-            $http.get(API_URL + "/admin/findUser", {
+            $http.get(API.url + "/admin/findUser", {
                 params: {q: identifier},
                 withCredentials: true,
             }).then(function successCallback(response){
@@ -513,7 +568,7 @@ app
             });
         },
         updateCourse: function(courseId, details, callback){
-            $http.post(API_URL + "/admin/course/" + courseId + "/update", {
+            $http.post(API.url + "/admin/course/" + courseId + "/update", {
                 d: details,
             },{
                 withCredentials: true,
@@ -525,7 +580,7 @@ app
             })
         },
         updateUser: function(userId, details, callback){
-            $http.post(API_URL + "/admin/user/" + userId + "/update", {
+            $http.post(API.url + "/admin/user/" + userId + "/update", {
                 d: details,
             },{
                 withCredentials: true,
@@ -557,7 +612,12 @@ app
         scope.inputWidth = {
             width: "18px",
         }
-        scope.chosen = [];
+        if(!scope.ngModel){
+            scope.ngModel = {
+                chosen : [],
+                query  : "",
+            };
+        }
         function calcHeight(list, cooe){
             try{
                 if(list.length<=1) return (1 * cooe + 1).toString() + "px";
@@ -596,7 +656,6 @@ app
                 width: (query.length * inputCooe + 12).toString() + "px",
             }
         }
-        scope.query = "";
         scope.openSearching = function(){openSearching();}
         scope.toggleSearching = function(){
             if(!open) openSearching();
@@ -605,22 +664,23 @@ app
         scope.add = function(user){
             new_user = {};
             new_user.Id = user.Id;
-            new_user.Email = user.Email;
+            new_user.Identifier = user.Identifier;
             new_user.Name = user.Name;
-            scope.chosen.push(new_user);
-            scope.query = "";
-            updateQueryBox(scope.query);
+            new_user.Suspended = user.Suspended;
+            scope.ngModel.chosen.push(new_user);
+            scope.ngModel.query = "";
+            updateQueryBox(scope.ngModel.query);
             closeSearching();
         }
         scope.remove = function(user){
-            var i = scope.chosen.indexOf(user);
-            if(i > -1) scope.chosen.splice(i, 1);
+            var i = scope.ngModel.chosen.indexOf(user);
+            if(i > -1) scope.ngModel.chosen.splice(i, 1);
         }
         scope.queryChange = function(query){
             updateQueryBox(query);
         }
-        scope.$watch('chosen+query', function() {  
-            ngModelCtrl.$setViewValue({chosen: scope.chosen, query: scope.query});
+        scope.$watch('ngModel.chosen+ngModel.query', function() {
+            ngModelCtrl.$setViewValue({chosen: scope.ngModel.chosen, query: scope.ngModel.query});
         });
         scope.$watch('options', function(){
             if(open){
@@ -636,11 +696,107 @@ app
         templateUrl: 'public/template/findUser.html',
         scope: {
             options: "=",
+            ngModel: "=",
         },
         link: link,
     }
 })
-.constant('ROLES', {COORDINATOR: 0, TUTOR: 1, STUDENT: 2});
+.directive('listEditUser', function(admin){
+    function link(scope, elem, attrs, ngModelCtrl){
+        var pending = {
+            removed: [],
+            added  : [],
+        };
+
+        scope.edit = false;
+        scope.findUserData = {chosen: [], query: ""};
+        scope.editMode = function(){
+            scope.edit=true;
+        }
+        function remove(scope, user){
+            scope.users = scope.users.slice(0,scope.users.indexOf(user))
+                            .concat(scope.users.slice(scope.users.indexOf(user)+1));
+        }
+        scope.removeUser = function(user){
+            var tempUser = {
+                Id         : user.Detail.Id,
+                Identifier : user.Detail.Identifier,
+                Name       : user.Detail.Name,
+                Suspended  : user.Detail.Suspended,
+            };
+
+            pending.removed.push(tempUser);
+            ngModelCtrl.$setViewValue(pending);
+            remove(scope, user);
+        }
+        scope.addUser = function(users){
+            for(i in users){
+                var tempUser = {
+                    Id         : users[i].Id,
+                    Identifier : users[i].Identifier,
+                    Name       : users[i].Name,
+                    Suspended  : users[i].Suspended,
+                };
+
+                pending.added.push(tempUser);
+                scope.users.push({
+                    Role   : scope.role,
+                    Detail : users[i],
+                });
+            }
+            scope.findUserData.chosen = [];
+
+            ngModelCtrl.$setViewValue(pending);
+        }
+        scope.submitChange = function(){
+            scope.update(function(){
+                // clear pending after communicate with api
+                pending.removed = [];
+                pending.added   = [];
+                ngModelCtrl.$setViewValue(pending);
+            });
+            scope.findUserData.chosen = [];
+            scope.findUserData.query  = "";
+            viewMode();
+        }
+        scope.changeData = function(findUserData){
+            if(findUserData.query.length >= 3){
+                function add2Options(response){
+                    scope.foundUsers = response.data.users;
+                }
+                admin.findUserByIdentifier(findUserData.query, add2Options);
+            }else{
+                scope.foundUsers = null;
+            }
+        }
+
+        function viewMode(){
+            scope.edit=false;
+        }
+    }
+
+    return {
+        restrict: "E",
+        require: "ngModel",
+        templateUrl: "public/template/listEditUser.html",
+        scope: {
+            users: "=",
+            role: "=",
+            title: "@",
+            update: "=",
+            ngModel: "=",
+        },
+        link: link,
+    }
+})
+.constant('ROLES', {COORDINATOR: 0, TUTOR: 1, STUDENT: 2})
+.constant('API', {url: './api'})
+.constant('REGEX', {
+    email    : /^[a-z0-9._%+-]+@(?:[a-z0-9-]+\.)+[a-z]{2,4}$/,
+    password : /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/,
+    username : /^[a-zA-Z0-9]{2,12}$/,
+    name     : /^.{3,}$/,
+});
 
 $('#menu-button').click(function() {
     $('.ui.sidebar').sidebar('toggle');

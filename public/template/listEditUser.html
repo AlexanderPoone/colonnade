@@ -1,0 +1,26 @@
+<div><h3 style="display: inline;">{{title}}</h3><span class="edit-tag" ng-hide="edit" ng-click="editMode()">Edit</span></div>
+<div ng-show="edit">
+  <find-user ng-change="changeData(findUserData)" ng-model="findUserData" options="foundUsers"></find-user>
+  <button class="ui blue button" ng-click="addUser(findUserData.chosen)">Add</button>
+</div>
+<table class="ui celled padded table">
+  <thead>
+    <tr>
+      <th ng-show="edit">Remove</th>
+      <th class="single line">Name</th>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Suspended</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="user in users | filter : {Role: role}">
+      <td ng-show="edit"><i class="remove user icon" ng-click="removeUser(user)"></i></td>
+      <td class="ui center aligned"><a ng-href="./#/admin/user/{{user.Detail.Id}}">{{user.Detail.Name}}</a></td>
+      <td class="ui center aligned">{{user.Detail.Identifier[1]}}</td>
+      <td class="ui center aligned">{{user.Detail.Identifier[0]}}</td>
+      <td class="ui center aligned">{{user.Detail.Suspended}}</td>
+    </tr>
+  </tbody>
+</table>
+<button class="ui blue button" ng-show="edit" ng-click="submitChange()">Done</button>

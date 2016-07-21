@@ -28,64 +28,10 @@
       </form>
     </div>
     <div class="ui divider"></div>
-    <div><h3 style="display: inline;">Coordinator(s)</h3><span class="edit-tag">Edit</span></div>
-    <table class="ui celled padded table">
-      <thead>
-        <tr>
-          <th class="single line">Name</th>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Suspended</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-repeat="user in course.Users | filter : {Role: ROLES.COORDINATOR}">
-          <td class="ui center aligned"><a ng-href="./#/admin/user/{{user.Detail.Id}}">{{user.Detail.Name}}</a></td>
-          <td class="ui center aligned">{{user.Detail.Identifier[1]}}</td>
-          <td class="ui center aligned">{{user.Detail.Identifier[0]}}</td>
-          <td class="ui center aligned">{{user.Detail.Suspended}}</td>
-        </tr>
-      </tbody>
-    </table>
+    <list-edit-user users="course.Users" role="ROLES.COORDINATOR" title="Coordinator(s)" update="updateCoordinators" ng-model="coordinatorsData"></list-edit-user>
     <div class="ui divider"></div>
-    <div><h3 style="display: inline;">Tutor(s)</h3><span class="edit-tag">Edit</span></div>
-    <table class="ui celled padded table">
-      <thead>
-        <tr>
-          <th class="single line">Name</th>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Suspended</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-repeat="user in course.Users | filter : {Role: ROLES.TUTOR}">
-          <td class="ui center aligned"><a ng-href="./#/admin/user/{{user.Detail.Id}}">{{user.Detail.Name}}</a></td>
-          <td class="ui center aligned">{{user.Detail.Identifier[1]}}</td>
-          <td class="ui center aligned">{{user.Detail.Identifier[0]}}</td>
-          <td class="ui center aligned">{{user.Detail.Suspended}}</td>
-        </tr>
-      </tbody>
-    </table>
+    <list-edit-user users="course.Users" role="ROLES.TUTOR" title="Tutor(s)" update="updateTutors" ng-model="tutorsData"></list-edit-user>
     <div class="ui divider"></div>
-    <div><h3 style="display: inline;">Student(s)</h3><span class="edit-tag">Edit</span></div>
-    <table class="ui celled padded table">
-      <thead>
-        <tr>
-          <th class="single line">Name</th>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Suspended</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-repeat="user in course.Users | filter : {Role: ROLES.STUDENT}">
-          <td class="ui center aligned"><a ng-href="./#/admin/user/{{user.Detail.Id}}">{{user.Detail.Name}}</a></td>
-          <td class="ui center aligned">{{user.Detail.Identifier[1]}}</td>
-          <td class="ui center aligned">{{user.Detail.Identifier[0]}}</td>
-          <td class="ui center aligned">{{user.Detail.Suspended}}</td>
-        </tr>
-      </tbody>
-    </table>
+    <list-edit-user users="course.Users" role="ROLES.STUDENT" title="Student(s)" update="updateStudents" ng-model="studentsData"></list-edit-user>
   </div>
 </div>
