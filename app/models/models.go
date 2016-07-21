@@ -432,15 +432,18 @@ func AdminAddUser2Course(s *mgo.Session,
     return 0, successUsers
 }
 
-func RemoveUserFromCourse(s *mgo.Session, courseId bson.ObjectId, u []bson.ObjectId) int {
-    err := coursesCollection(s).Update(
-        bson.M{"_id": courseId},
-        bson.M{"$pull": bson.M{
-            "users": bson.M{"uid": bson.M{"$in": u}},
-        }},
-    )
+func RemoveUserFromCourse(s *mgo.Session, courseId bson.ObjectId, u []string) int {
+    fault := false
+    for _, user := range u{
+        err := coursesCollection(s).Update(
+            bson.M{"_id": courseId},
+            bson.M{"$unset": bson.M{"users." + user: ""}},
+        )
 
-    if err != nil { return 1 }
+        if err != nil { fault = true }
+    }
+    
+    if fault { return 1 }
     return 0
 }
 
@@ -456,11 +459,11 @@ func AdminRemoveUserFromCourse(s *mgo.Session,
     courseId := bson.ObjectIdHex(courseIdHex)
 
     var successUsers []int
-    var users []bson.ObjectId
+    var users []string
     for _, value := range UsersIdHex {
         if bson.IsObjectIdHex(value) {
             successUsers = append(successUsers, 0)
-            users = append(users, bson.ObjectIdHex(value))
+            users = append(users, value)
         }else{
             successUsers = append(successUsers, 1)
         }
