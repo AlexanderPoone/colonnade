@@ -265,7 +265,7 @@ app
     }
 
     $scope.coordinatorsData = {};
-    $scope.updateCoordinators = function(){
+    $scope.updateCoordinators = function(callback){
         var userAdding = [];
         for(i in $scope.coordinatorsData.added){
             userAdding.push({uid: $scope.coordinatorsData.added[i].Id, role: ROLES.COORDINATOR});
@@ -276,12 +276,12 @@ app
             userRemoving.push($scope.coordinatorsData.removed[i].Id);
         }
 
-        if(userAdding.length) admin.addUsers2Course(courseId, userAdding);
-        if(userRemoving.length) admin.removeUsersFromCourse(courseId, userRemoving);
+        if(userAdding.length) admin.addUsers2Course(courseId, userAdding, callback);
+        if(userRemoving.length) admin.removeUsersFromCourse(courseId, userRemoving, callback);
     }
 
     $scope.tutorsData = {};
-    $scope.updateTutors = function(){
+    $scope.updateTutors = function(callback){
         var userAdding = [];
         for(i in $scope.tutorsData.added){
             userAdding.push({uid: $scope.tutorsData.added[i].Id, role: ROLES.TUTOR});
@@ -291,12 +291,12 @@ app
             userRemoving.push($scope.tutorsData.removed[i].Id);
         }
 
-        if(userAdding.length) admin.addUsers2Course(courseId, userAdding);
-        if(userRemoving.length) admin.removeUsersFromCourse(courseId, userRemoving);
+        if(userAdding.length) admin.addUsers2Course(courseId, userAdding, callback);
+        if(userRemoving.length) admin.removeUsersFromCourse(courseId, userRemoving, callback);
     }
 
     $scope.studentsData = {};
-    $scope.updateStudents = function(){
+    $scope.updateStudents = function(callback){
         var userAdding = [];
         for(i in $scope.studentsData.added){
             userAdding.push({uid: $scope.studentsData.added[i].Id, role: ROLES.STUDENT});
@@ -306,8 +306,8 @@ app
             userRemoving.push($scope.studentsData.removed[i].Id);
         }
 
-        if(userAdding.length) admin.addUsers2Course(courseId, userAdding);
-        if(userRemoving.length) admin.removeUsersFromCourse(courseId, userRemoving);
+        if(userAdding.length) admin.addUsers2Course(courseId, userAdding, callback);
+        if(userRemoving.length) admin.removeUsersFromCourse(courseId, userRemoving, callback);
     }
 })
 .controller("adminUsersCtrl", function($scope, $routeParams, login, admin){
@@ -749,7 +749,12 @@ app
             ngModelCtrl.$setViewValue(pending);
         }
         scope.submitChange = function(){
-            scope.update();
+            scope.update(function(){
+                // clear pending after communicate with api
+                pending.removed = [];
+                pending.added   = [];
+                ngModelCtrl.$setViewValue(pending);
+            });
             scope.findUserData.chosen = [];
             scope.findUserData.query  = "";
             viewMode();
@@ -778,7 +783,7 @@ app
             users: "=",
             role: "=",
             title: "@",
-            update: "&",
+            update: "=",
             ngModel: "=",
         },
         link: link,
