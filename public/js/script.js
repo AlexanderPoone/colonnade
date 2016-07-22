@@ -10,6 +10,9 @@ app
     .when('/dashboard/',{
         templateUrl:'public/template/dashboard.html',
         controller:'dashboardCtrl'})
+    .when('/course/:Id',{
+        templateUrl:'public/template/course.html',
+        controller:'courseCtrl'})
     .when('/login/',{
         templateUrl:'public/template/login.html',
         controller:'loginCtrl'})
@@ -58,6 +61,8 @@ app
             $scope.courses.student     = res.data.asStudent;
         })
     }
+})
+.controller("courseCtrl", function($scope, $http, $location, login, user){
 })
 .controller("loginCtrl", function($scope, $location, REGEX, login, register){
     $scope.login = function() {
