@@ -256,6 +256,29 @@ func CoursesForUser(s *mgo.Session, UserIdHex string) (int, []Course_db, []Cours
     return 0, groups[COODRINATORS], groups[TUTORS], groups[STUDENTS]
 }
 
+func UserCourse(s *mgo.Session, UserIdHex, CourseIdHex string) (int, Course_db) {
+    isValidId := bson.IsObjectIdHex(UserIdHex)
+    if !isValidId { return 2, Course_db{} }
+    isValidId = bson.IsObjectIdHex(CourseIdHex)
+    if !isValidId { return 3, Course_db{} }
+
+    var result Course_db
+    err := coursesCollection(s).Find(bson.M{
+        "$and": []bson.M{
+            bson.M{"_id": bson.ObjectIdHex(CourseIdHex)},
+            bson.M{"users." + UserIdHex: bson.M{"$exists": true}},
+            bson.M{"suspended": false},
+        },
+    }).Select(bson.M{
+        "suspended": 0,
+        "users": 0,
+    }).One(&result)
+
+    if err != nil { return 4, Course_db{} }
+
+    return 0, result
+}
+
 func CheckAdmin(s *mgo.Session, user User_t) int {
     if LoginStatus(user) != 0 { return 1 }
     isValidId := bson.IsObjectIdHex(user.UserIdHex)
