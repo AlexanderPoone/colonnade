@@ -62,7 +62,9 @@ app
         })
     }
 })
-.controller("courseCtrl", function($scope, $http, $location, login, user){
+.controller("courseCtrl", function($scope, $http, $routeParams, user){
+    var Id = $routeParams.Id;
+    user.getCourse(Id);
 })
 .controller("loginCtrl", function($scope, $location, REGEX, login, register){
     $scope.login = function() {
@@ -467,6 +469,16 @@ app
     return {
         getCoursesForUser: function(callback){
             $http.get(API.url + "/courses", {
+                withCredentials: true,
+            }).then(function successCallback(response){
+                if(callback) callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            })
+        },
+        getCourse: function(Id, callback){
+            $http.get(API.url + "/course/" + Id, {
                 withCredentials: true,
             }).then(function successCallback(response){
                 if(callback) callback(response.data);
