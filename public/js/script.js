@@ -469,7 +469,7 @@ app
             $http.get(API.url + "/courses", {
                 withCredentials: true,
             }).then(function successCallback(response){
-                callback(response.data);
+                if(callback) callback(response.data);
             }, function errorCallback(response){
                 console.log("error");
                 if(callback) callback(response.data);
