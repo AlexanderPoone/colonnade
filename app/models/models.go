@@ -11,6 +11,7 @@ import (
     "github.com/ip4368/go-password"
     "strings"
     "time"
+    "fmt"
 )
 
 const COODRINATORS = 0
@@ -267,13 +268,14 @@ func UserCourse(s *mgo.Session, UserIdHex, CourseIdHex string) (int, Course_db) 
         "$and": []bson.M{
             bson.M{"_id": bson.ObjectIdHex(CourseIdHex)},
             bson.M{"users." + UserIdHex: bson.M{"$exists": true}},
-            bson.M{"suspended": false},
+            bson.M{"suspended": bson.M{"$ne": true}},
         },
     }).Select(bson.M{
         "suspended": 0,
         "users": 0,
     }).One(&result)
 
+    fmt.Println(err)
     if err != nil { return 4, Course_db{} }
 
     return 0, result
