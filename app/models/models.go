@@ -11,7 +11,6 @@ import (
     "github.com/ip4368/go-password"
     "strings"
     "time"
-    "fmt"
 )
 
 const COODRINATORS = 0
@@ -275,7 +274,6 @@ func UserCourse(s *mgo.Session, UserIdHex, CourseIdHex string) (int, Course_db) 
         "users": 0,
     }).One(&result)
 
-    fmt.Println(err)
     if err != nil { return 4, Course_db{} }
 
     return 0, result
