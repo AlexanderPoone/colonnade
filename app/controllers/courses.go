@@ -49,9 +49,19 @@ func (c Courses) CoursesForUser() revel.Result {
     return c.RenderJson(data)
 }
 
-func (c Courses) Course(CourseIdHex string) revel.Result {
-    //result := models.RegisterHandler(c.MongoSession, r.Email, r.Username, r.Password, r.Name)
-    result := 0
+func (c Courses) Course(Id string) revel.Result {
+    loginStat := models.LoginStatus(
+        models.User_t{
+            Email: c.Session["email"],
+            Username: c.Session["username"],
+            Name: c.Session["name"],
+            UserIdHex: c.Session["userId"],
+        })
+    var result int = 0
+    var courseData models.Course_db
+    if loginStat == 0 {
+        result, courseData = models.UserCourse(c.MongoSession, c.Session["userId"], Id)
+    } else { result = 1 }
 
     // start with initialise response interface
     data := make(map[string]interface{})
@@ -59,6 +69,15 @@ func (c Courses) Course(CourseIdHex string) revel.Result {
     switch result {
         case 0 :
             data["message"] = "Sucess"
+            data["data"]    = courseData
+        case 1 :
+            data["message"] = "User has not logged in"
+        case 2 :
+            data["message"] = "Invalid User ID"
+        case 3 :
+            data["message"] = "Invalid Course ID"
+        case 4 :
+            data["message"] = "Unexpected Error in Database"
     }
     return c.RenderJson(data)
 }

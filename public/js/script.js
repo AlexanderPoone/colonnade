@@ -10,6 +10,9 @@ app
     .when('/dashboard/',{
         templateUrl:'public/template/dashboard.html',
         controller:'dashboardCtrl'})
+    .when('/course/:Id',{
+        templateUrl:'public/template/course.html',
+        controller:'courseCtrl'})
     .when('/login/',{
         templateUrl:'public/template/login.html',
         controller:'loginCtrl'})
@@ -58,6 +61,10 @@ app
             $scope.courses.student     = res.data.asStudent;
         })
     }
+})
+.controller("courseCtrl", function($scope, $http, $routeParams, user){
+    var Id = $routeParams.Id;
+    user.getCourse(Id);
 })
 .controller("loginCtrl", function($scope, $location, REGEX, login, register){
     $scope.login = function() {
@@ -464,7 +471,17 @@ app
             $http.get(API.url + "/courses", {
                 withCredentials: true,
             }).then(function successCallback(response){
-                callback(response.data);
+                if(callback) callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            })
+        },
+        getCourse: function(Id, callback){
+            $http.get(API.url + "/course/" + Id, {
+                withCredentials: true,
+            }).then(function successCallback(response){
+                if(callback) callback(response.data);
             }, function errorCallback(response){
                 console.log("error");
                 if(callback) callback(response.data);
