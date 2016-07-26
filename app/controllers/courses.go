@@ -69,7 +69,8 @@ func (c Courses) Course(Id string) revel.Result {
     switch result {
         case 0 :
             data["message"] = "Sucess"
-            data["data"]    = courseData
+            data["data"]    = make(map[string]interface{})
+            data["data"].(map[string]interface{})["course"] = courseData
         case 1 :
             data["message"] = "User has not logged in"
         case 2 :
