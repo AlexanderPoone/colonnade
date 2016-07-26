@@ -63,8 +63,12 @@ app
     }
 })
 .controller("courseCtrl", function($scope, $http, $routeParams, user){
+    $scope.course = {};
     var Id = $routeParams.Id;
-    user.getCourse(Id);
+
+    user.getCourse(Id, function(res){
+        $scope.course = res.data.course;
+    });
 })
 .controller("loginCtrl", function($scope, $location, REGEX, login, register){
     $scope.login = function() {
