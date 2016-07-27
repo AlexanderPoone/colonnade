@@ -37,5 +37,9 @@ POST	/api/admin/user/:Id/update              Admins.UpdateUser()
 GET		/api/admin/user/:Id                     Admins.User()
 GET		/api/admin/findUser                     Admins.FindUserByIdentifier()
 
+# Coordinator(s) endpoint
+POST	/api/coordinator/:Id/addStages          Coordinators.AddStages()
+POST	/api/coordinator/:Id/addTasks           Coordinators.AddTasks()
+
 # Catch all
 #*      /:controller/:action                    :controller.:action
