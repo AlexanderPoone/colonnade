@@ -635,3 +635,15 @@ func AdminGetUserByIdentifier(s *mgo.Session,
     if status != 0 { return 2, []User_db{} }
     return 0, result
 }
+
+func isCoordinator(Id bson.ObjectId) bool {
+    return false
+}
+
+func CoordinatorAddStages(s *mgo.Session, user User_t, courseIdHex string, stages []string) (int, []int) {
+    return 0, []int{}
+}
+
+func CoordinatorAddTasks(s *mgo.Session, user User_t, courseIdHex string, tasks []string) (int, []int) {
+    return 0, []int{}
+}
