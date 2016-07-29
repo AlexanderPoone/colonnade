@@ -39,7 +39,7 @@ GET		/api/admin/findUser                     Admins.FindUserByIdentifier()
 
 # Coordinator(s) endpoint
 POST	/api/coordinator/:Id/addStages          Coordinators.AddStages()
-POST	/api/coordinator/:Id/addTasks           Coordinators.AddTasks()
+POST	/api/coordinator/:Id/:Stage/addTasks    Coordinators.AddTasks()
 
 # Catch all
 #*      /:controller/:action                    :controller.:action
