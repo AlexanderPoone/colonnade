@@ -10,6 +10,7 @@ import (
     "github.com/ip4368/go-userprofile"
     "github.com/ip4368/go-password"
     "strings"
+    "strconv"
     "time"
 )
 
@@ -407,6 +408,7 @@ func AdminNewCourse(s *mgo.Session, user User_t, admin string, course Course_t) 
         Users       : UserInCourse_db{},
         TimeCreated : time.Now(),
         Id          : id,
+        Accessments : []Stage_db{},
     }
 
     err := coursesCollection(s).Insert(newCourse)
@@ -640,10 +642,73 @@ func isCoordinator(Id bson.ObjectId) bool {
     return false
 }
 
-func CoordinatorAddStages(s *mgo.Session, user User_t, courseIdHex string, stages []string) (int, []int) {
-    return 0, []int{}
+func CoordinatorAddStages(s *mgo.Session, user User_t, courseIdHex string, stages []string) int {
+    if !bson.IsObjectIdHex(user.UserIdHex) { return 1 }
+
+    if !bson.IsObjectIdHex(courseIdHex) { return 2 }
+    courseId := bson.ObjectIdHex(courseIdHex)
+
+    var allStages []Stage_db
+    for _, stage := range stages {
+        allStages = append(allStages, Stage_db{
+            Description : stage,
+            Tasks       : []Task_db{},
+        })
+    }
+
+    err := coursesCollection(s).Update(bson.M{
+            "$and": bson.M{
+                "_id"  : courseId,
+                "users": bson.M{
+                             user.UserIdHex: COODRINATORS,
+                         },
+            },
+        },
+        bson.M{
+            "$push": bson.M{
+                "accessments": bson.M{
+                    "$each": allStages,
+                },
+            },
+        },
+    )
+
+    if err != nil { return 3 }
+    return 0
 }
 
-func CoordinatorAddTasks(s *mgo.Session, user User_t, courseIdHex string, tasks []string) (int, []int) {
-    return 0, []int{}
+func CoordinatorAddTasks(s *mgo.Session, user User_t, courseIdHex string, stage int, tasks []string) int {
+    if !bson.IsObjectIdHex(user.UserIdHex) { return 1 }
+
+    if !bson.IsObjectIdHex(courseIdHex) { return 2 }
+    courseId := bson.ObjectIdHex(courseIdHex)
+
+    var allTasks []Task_db
+    for _, task := range tasks {
+        allTasks = append(allTasks, Task_db{
+            Description : task,
+            AllowLang   : []string{},
+            TestCases   : []TestCase_db{},
+        })
+    }
+
+    err := coursesCollection(s).Update(bson.M{
+            "$and": bson.M{
+                "_id"  : courseId,
+                "users": bson.M{
+                             user.UserIdHex: COODRINATORS,
+                         },
+            },
+        },
+        bson.M{
+            "$push": bson.M{
+                "accessments." + strconv.Itoa(stage) + ".tasks": bson.M{
+                    "$each": allTasks,
+                },
+            },
+        },
+    )
+
+    if err != nil { return 3 }
+    return 0
 }
