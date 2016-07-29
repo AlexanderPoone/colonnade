@@ -17,7 +17,7 @@ func (c Coordinators) AddStages(Id string) revel.Result {
 	}
 	models.ParseBody(c.Request.Body, &stages)
 
-	models.CoordinatorAddStages(
+	result := models.CoordinatorAddStages(
 		c.MongoSession,
 		models.User_t{
 			Email: c.Session["email"],
@@ -28,16 +28,29 @@ func (c Coordinators) AddStages(Id string) revel.Result {
 		Id,
 		stages.Description,
 	)
-	return c.RenderJson([]int{})
+
+	data := make(map[string]interface{})
+	data["error"] = result
+	switch result{
+		case 0:
+			data["message"] = "Stages have been added"
+		case 1:
+			data["message"] = "Course ID is invalid"
+		case 2:
+			data["message"] = "Your login session is not valid"
+		case 3:
+			data["message"] = "Course is not found"
+	}
+	return c.RenderJson(data)
 }
 
-func (c Coordinators) AddTasks(Id string) revel.Result {
+func (c Coordinators) AddTasks(Id string, Stage int) revel.Result {
 	var tasks struct{
 		Description []string `json:"d"`
 	}
 	models.ParseBody(c.Request.Body, &tasks)
 
-	models.CoordinatorAddTasks(
+	result := models.CoordinatorAddTasks(
 		c.MongoSession,
 		models.User_t{
 			Email: c.Session["email"],
@@ -46,7 +59,21 @@ func (c Coordinators) AddTasks(Id string) revel.Result {
             UserIdHex: c.Session["userId"],
 		},
 		Id,
+		Stage,
 		tasks.Description,
 	)
-	return c.RenderJson([]int{})
+	
+	data := make(map[string]interface{})
+	data["error"] = result
+	switch result{
+		case 0:
+			data["message"] = "Stages have been added"
+		case 1:
+			data["message"] = "Course ID is invalid"
+		case 2:
+			data["message"] = "Your login session is not valid"
+		case 3:
+			data["message"] = "Course is not found"
+	}
+	return c.RenderJson(data)
 }
