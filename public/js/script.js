@@ -62,8 +62,11 @@ app
         })
     }
 })
-.controller("courseCtrl", function($scope, $http, $routeParams, user){
+.controller("courseCtrl", function($scope, $http, $routeParams, user, login, ROLES){
     $scope.course = {};
+    $scope.user   = login.getUser();
+    $scope.ROLES  = ROLES;
+    console.log($scope.user);
     var Id = $routeParams.Id;
 
     user.getCourse(Id, function(res){
@@ -384,14 +387,16 @@ app
         }).then(function successCallback(response) {
             if(response.data.error == 0){
                 user.loggedIn = true;
-                user.name = response.data.data.name;
+                user.name  = response.data.data.name;
                 user.email = response.data.data.email;
+                user.id    = response.data.data.id;
                 user.admin = globScope.admin = response.data.data.admin;
                 globScope.login = true;
             }else{
                 user.loggedIn = false;
-                user.name = "";
+                user.name  = "";
                 user.email = "";
+                user.id    = "";
                 user.admin = globScope.admin = false;
                 globScope.login = false;
             }
@@ -415,9 +420,10 @@ app
             }).then(function successCallback(response) {
                 if(response.data.error == 0){
                     user.loggedIn = true;
-                    user.name = response.data.data.name;
-                    user.email = email;
-                    user.admin = globScope.admin = response.data.data.admin;
+                    user.name     = response.data.data.name;
+                    user.email    = email;
+                    user.id     = response.data.data.id;
+                    user.admin    = globScope.admin = response.data.data.admin;
                     globScope.login = true;
                 }
                 if(callback) callback(response.data);
@@ -436,9 +442,10 @@ app
             }).then(function successCallback(response) {
                 if(response.data.error == 0){
                     user.loggedIn = false;
-                    user.name = "";
-                    user.email = "";
-                    user.admin = globScope.admin = false;
+                    user.name     = "";
+                    user.email    = "";
+                    user.id       = "";
+                    user.admin    = globScope.admin = false;
                     globScope.login = false;
                 }
                 if(callback) callback(response.data);

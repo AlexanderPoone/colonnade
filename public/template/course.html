@@ -1,5 +1,7 @@
 <div class="content-wrapper">
   <div class="ui container">
+  	<h3 class="non-student-tag" ng-show="course.Users[user.id] == ROLES.COORDINATOR">Coordinator Dashboard</h3>
+  	<h3 class="non-student-tag" ng-show="course.Users[user.id] == ROLES.COORDINATOR || course.Users[user.id] == ROLES.TUTOR">Tutor Dashboard</h3>
     <h1 ng-bind="course.Name"></h1>
     <p ng-bind="course.Description"></p>
     <div class="ui divider"></div>
