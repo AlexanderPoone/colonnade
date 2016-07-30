@@ -271,8 +271,12 @@ func UserCourse(s *mgo.Session, UserIdHex, CourseIdHex string) (int, Course_db) 
             bson.M{"suspended": bson.M{"$ne": true}},
         },
     }).Select(bson.M{
-        "suspended": 0,
-        "users": 0,
+        "accessments": 1,
+        "description": 1,
+        "_id": 1,
+        "name": 1,
+        "timeCreated": 1,
+        "users." + UserIdHex: 1,
     }).One(&result)
 
     if err != nil { return 4, Course_db{} }
