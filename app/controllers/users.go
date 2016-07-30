@@ -73,6 +73,7 @@ func (c Users) Login() revel.Result {
             data["message"] = "Successfully Logged In"
             data["data"] = make(map[string]interface{})
             data["data"].(map[string]interface{})["name"] = name
+            data["data"].(map[string]interface{})["id"]   = id
             c.Session["email"] = identifier[0]
             c.Session["username"] = identifier[1]
             c.Session["name"] = name
@@ -134,8 +135,9 @@ func (c Users) LoginInfo() revel.Result {
         case 0 :
             data["message"] = "Logged In"
             data["data"] = make(map[string]interface{})
-            data["data"].(map[string]interface{})["name"] = c.Session["name"]
+            data["data"].(map[string]interface{})["name"]  = c.Session["name"]
             data["data"].(map[string]interface{})["email"] = c.Session["email"]
+            data["data"].(map[string]interface{})["id"]    = c.Session["userId"]
             if c.Session["admin"] == "t" {
                 data["data"].(map[string]interface{})["admin"] = true
             }
