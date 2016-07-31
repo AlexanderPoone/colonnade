@@ -13,6 +13,12 @@ app
     .when('/course/:Id',{
         templateUrl:'public/template/course.html',
         controller:'courseCtrl'})
+    .when('/course/:Id/coordinator',{
+        templateUrl:'public/template/courseCoordinator.html',
+        controller:'courseCoordinatorCtrl'})
+    .when('/course/:Id/tutor',{
+        templateUrl:'public/template/courseTutor.html',
+        controller:'courseTutorCtrl'})
     .when('/login/',{
         templateUrl:'public/template/login.html',
         controller:'loginCtrl'})
@@ -66,12 +72,17 @@ app
     $scope.course = {};
     $scope.user   = login.getUser();
     $scope.ROLES  = ROLES;
-    console.log($scope.user);
     var Id = $routeParams.Id;
 
     user.getCourse(Id, function(res){
         $scope.course = res.data.course;
     });
+})
+.controller("courseCoordinatorCtrl", function(){
+
+})
+.controller("courseTutorCtrl", function(){
+
 })
 .controller("loginCtrl", function($scope, $location, REGEX, login, register){
     $scope.login = function() {
