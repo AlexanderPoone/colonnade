@@ -644,6 +644,17 @@ app
         }
     }
 })
+.factory("coordinator", function($http){
+    return {
+        addStages: function(){
+            return;
+        },
+    }
+})
+.factory("tutor", function($http){
+    return {
+    }
+})
 .directive("findUser", function(){
     function link(scope, elem, attrs, ngModelCtrl){
         var cooe = 40;
