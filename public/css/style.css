@@ -165,6 +165,14 @@ html, body {
     color: #4183C4;
 }
 
+.non-student-tag {
+    float: right;
+    display: inline;
+    cursor: pointer;
+    color: #4183C4;
+    margin: 0 0 0 10px;
+}
+
 .msg404 {
     text-align: center;
 }

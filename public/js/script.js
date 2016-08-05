@@ -13,6 +13,12 @@ app
     .when('/course/:Id',{
         templateUrl:'public/template/course.html',
         controller:'courseCtrl'})
+    .when('/course/:Id/coordinator',{
+        templateUrl:'public/template/courseCoordinator.html',
+        controller:'courseCoordinatorCtrl'})
+    .when('/course/:Id/tutor',{
+        templateUrl:'public/template/courseTutor.html',
+        controller:'courseTutorCtrl'})
     .when('/login/',{
         templateUrl:'public/template/login.html',
         controller:'loginCtrl'})
@@ -62,9 +68,21 @@ app
         })
     }
 })
-.controller("courseCtrl", function($scope, $http, $routeParams, user){
+.controller("courseCtrl", function($scope, $http, $routeParams, user, login, ROLES){
+    $scope.course = {};
+    $scope.user   = login.getUser();
+    $scope.ROLES  = ROLES;
     var Id = $routeParams.Id;
-    user.getCourse(Id);
+
+    user.getCourse(Id, function(res){
+        $scope.course = res.data.course;
+    });
+})
+.controller("courseCoordinatorCtrl", function(){
+
+})
+.controller("courseTutorCtrl", function(){
+
 })
 .controller("loginCtrl", function($scope, $location, REGEX, login, register){
     $scope.login = function() {
@@ -380,14 +398,16 @@ app
         }).then(function successCallback(response) {
             if(response.data.error == 0){
                 user.loggedIn = true;
-                user.name = response.data.data.name;
+                user.name  = response.data.data.name;
                 user.email = response.data.data.email;
+                user.id    = response.data.data.id;
                 user.admin = globScope.admin = response.data.data.admin;
                 globScope.login = true;
             }else{
                 user.loggedIn = false;
-                user.name = "";
+                user.name  = "";
                 user.email = "";
+                user.id    = "";
                 user.admin = globScope.admin = false;
                 globScope.login = false;
             }
@@ -411,9 +431,10 @@ app
             }).then(function successCallback(response) {
                 if(response.data.error == 0){
                     user.loggedIn = true;
-                    user.name = response.data.data.name;
-                    user.email = email;
-                    user.admin = globScope.admin = response.data.data.admin;
+                    user.name     = response.data.data.name;
+                    user.email    = email;
+                    user.id     = response.data.data.id;
+                    user.admin    = globScope.admin = response.data.data.admin;
                     globScope.login = true;
                 }
                 if(callback) callback(response.data);
@@ -432,9 +453,10 @@ app
             }).then(function successCallback(response) {
                 if(response.data.error == 0){
                     user.loggedIn = false;
-                    user.name = "";
-                    user.email = "";
-                    user.admin = globScope.admin = false;
+                    user.name     = "";
+                    user.email    = "";
+                    user.id       = "";
+                    user.admin    = globScope.admin = false;
                     globScope.login = false;
                 }
                 if(callback) callback(response.data);
@@ -620,6 +642,17 @@ app
                 scopeData[Type] = origData[Type]
             }
         }
+    }
+})
+.factory("coordinator", function($http){
+    return {
+        addStages: function(){
+            return;
+        },
+    }
+})
+.factory("tutor", function($http){
+    return {
     }
 })
 .directive("findUser", function(){

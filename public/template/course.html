@@ -1,0 +1,11 @@
+<div class="content-wrapper">
+  <div class="ui container">
+  	<a ng-href="./#/course/{{course.Id}}/coordinator"><h3 class="non-student-tag" ng-show="course.Users[user.id] == ROLES.COORDINATOR">Coordinator Dashboard</h3></a>
+  	<a ng-href="./#/course/{{course.Id}}/tutor"><h3 class="non-student-tag" ng-show="course.Users[user.id] == ROLES.COORDINATOR || course.Users[user.id] == ROLES.TUTOR">Tutor Dashboard</h3></a>
+    <h1 ng-bind="course.Name"></h1>
+    <p ng-bind="course.Description"></p>
+    <div class="ui divider"></div>
+    <h3>Assessment(s)</h3>
+    <p ng-repeat="Assessment in course.Assessments">{{Assessment.Description}}</p>
+  </div>
+</div>
