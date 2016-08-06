@@ -658,6 +658,18 @@ app
                 if(callback) callback(response.data);
             })
         },
+        addTasks: function(courseId, stage_no, tasks, callback){
+            $http.post(API.url + "/coordinator/" + courseId + "/" + stage_no.toString() + "/addTasks", {
+                d: tasks,
+            },{
+                withCredentials: true,
+            }).then(function successCallback(response){
+                if(callback) callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            })
+        },
     }
 })
 .factory("tutor", function($http){
