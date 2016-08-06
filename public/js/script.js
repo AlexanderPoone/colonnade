@@ -644,10 +644,19 @@ app
         }
     }
 })
-.factory("coordinator", function($http){
+.factory("coordinator", function($http, API){
     return {
-        addStages: function(){
-            return;
+        addStages: function(courseId, stages, callback){
+            $http.post(API.url + "/coordinator/" + courseId + "/addStages", {
+                d: stages,
+            },{
+                withCredentials: true;
+            }).then(function successCallback(response){
+                if(callback) callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            })
         },
     }
 })
