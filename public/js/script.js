@@ -650,7 +650,7 @@ app
             $http.post(API.url + "/coordinator/" + courseId + "/addStages", {
                 d: stages,
             },{
-                withCredentials: true;
+                withCredentials: true,
             }).then(function successCallback(response){
                 if(callback) callback(response.data);
             }, function errorCallback(response){
