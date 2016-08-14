@@ -16,6 +16,12 @@ app
     .when('/course/:Id/coordinator',{
         templateUrl:'public/template/courseCoordinator.html',
         controller:'courseCoordinatorCtrl'})
+    .when('/course/:Id/coordinator/stages/add',{
+        templateUrl:'public/template/courseCoordinatorAddStages.html',
+        controller:'courseCoordinatorAddStagesCtrl'})
+    .when('/course/:Id/coordinator/tasks/add',{
+        templateUrl:'public/template/courseCoordinatorAddTasks.html',
+        controller:'courseCoordinatorAddTasksCtrl'})
     .when('/course/:Id/tutor',{
         templateUrl:'public/template/courseTutor.html',
         controller:'courseTutorCtrl'})
@@ -78,7 +84,13 @@ app
         $scope.course = res.data.course;
     });
 })
-.controller("courseCoordinatorCtrl", function($scope, $routeParams, user, login, ROLES){
+.controller("courseCoordinatorCtrl", function($scope, $routeParams, coordinator, ROLES){
+    $scope.courseId = $routeParams.Id;
+})
+.controller("courseCoordinatorAddStagesCtrl", function($scope, $routeParams, coordinator, ROLES){
+    $scope.courseId = $routeParams.Id;
+})
+.controller("courseCoordinatorAddTasksCtrl", function($scope, $routeParams, coordinator, ROLES){
     $scope.courseId = $routeParams.Id;
 })
 .controller("courseTutorCtrl", function($scope, $routeParams){
