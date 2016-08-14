@@ -78,11 +78,11 @@ app
         $scope.course = res.data.course;
     });
 })
-.controller("courseCoordinatorCtrl", function(){
-
+.controller("courseCoordinatorCtrl", function($scope, $routeParams, user, login, ROLES){
+    $scope.courseId = $routeParams.Id;
 })
-.controller("courseTutorCtrl", function(){
-
+.controller("courseTutorCtrl", function($scope, $routeParams){
+    $scope.courseId = $routeParams.Id;
 })
 .controller("loginCtrl", function($scope, $location, REGEX, login, register){
     $scope.login = function() {
