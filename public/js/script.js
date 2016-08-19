@@ -22,6 +22,9 @@ app
     .when('/course/:Id/coordinator/tasks/add',{
         templateUrl:'public/template/courseCoordinatorAddTasks.html',
         controller:'courseCoordinatorAddTasksCtrl'})
+    .when('/course/:Id/coordinator/manage/:user',{
+        templateUrl:'public/template/courseManageUser.html',
+        controller:'courseManageUserCtrl'})
     .when('/course/:Id/tutor',{
         templateUrl:'public/template/courseTutor.html',
         controller:'courseTutorCtrl'})
@@ -92,6 +95,9 @@ app
 })
 .controller("courseCoordinatorAddTasksCtrl", function($scope, $routeParams, coordinator, ROLES){
     $scope.courseId = $routeParams.Id;
+})
+.controller("courseManageUserCtrl", function($scope, $routeParams, coordinator, ROLES){
+    $scope.user = $routeParams.user;
 })
 .controller("courseTutorCtrl", function($scope, $routeParams){
     $scope.courseId = $routeParams.Id;
