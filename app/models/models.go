@@ -716,3 +716,7 @@ func CoordinatorAddTasks(s *mgo.Session, user User_t, courseIdHex string, stage 
     if err != nil { return 3 }
     return 0
 }
+
+func CoordinatorGetUsers(s *mgo.Session, user User_t, CourseIdHex string, UserType string) (int, []User_db){
+    return 0, []User_db{}
+}
