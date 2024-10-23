@@ -77,3 +77,27 @@ func (c Coordinators) AddTasks(Id string, Stage int) revel.Result {
 	}
 	return c.RenderJson(data)
 }
+
+func (c Coordinators) GetUsers(Id string, UserType string) revel.Result {
+	result, users := models.CoordinatorGetUsers(
+		c.MongoSession,
+		models.User_t{
+			Email: c.Session["email"],
+            Username: c.Session["username"],
+            Name: c.Session["name"],
+            UserIdHex: c.Session["userId"],
+		},
+		Id,
+		UserType,
+	)
+	
+	data := make(map[string]interface{})
+	data["error"] = result
+	switch result{
+		case 0:
+			data["message"] = "Success"
+			data["data"]    = make(map[string]interface{})
+			data["data"].(map[string]interface{})["users"] = users
+	}
+	return c.RenderJson(data)
+}

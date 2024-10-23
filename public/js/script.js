@@ -16,6 +16,15 @@ app
     .when('/course/:Id/coordinator',{
         templateUrl:'public/template/courseCoordinator.html',
         controller:'courseCoordinatorCtrl'})
+    .when('/course/:Id/coordinator/stages/add',{
+        templateUrl:'public/template/courseCoordinatorAddStages.html',
+        controller:'courseCoordinatorAddStagesCtrl'})
+    .when('/course/:Id/coordinator/tasks/add',{
+        templateUrl:'public/template/courseCoordinatorAddTasks.html',
+        controller:'courseCoordinatorAddTasksCtrl'})
+    .when('/course/:Id/coordinator/manage/:user',{
+        templateUrl:'public/template/courseManageUser.html',
+        controller:'courseManageUserCtrl'})
     .when('/course/:Id/tutor',{
         templateUrl:'public/template/courseTutor.html',
         controller:'courseTutorCtrl'})
@@ -78,11 +87,20 @@ app
         $scope.course = res.data.course;
     });
 })
-.controller("courseCoordinatorCtrl", function(){
-
+.controller("courseCoordinatorCtrl", function($scope, $routeParams, coordinator, ROLES){
+    $scope.courseId = $routeParams.Id;
 })
-.controller("courseTutorCtrl", function(){
-
+.controller("courseCoordinatorAddStagesCtrl", function($scope, $routeParams, coordinator, ROLES){
+    $scope.courseId = $routeParams.Id;
+})
+.controller("courseCoordinatorAddTasksCtrl", function($scope, $routeParams, coordinator, ROLES){
+    $scope.courseId = $routeParams.Id;
+})
+.controller("courseManageUserCtrl", function($scope, $routeParams, coordinator, ROLES){
+    $scope.user = $routeParams.user;
+})
+.controller("courseTutorCtrl", function($scope, $routeParams){
+    $scope.courseId = $routeParams.Id;
 })
 .controller("loginCtrl", function($scope, $location, REGEX, login, register){
     $scope.login = function() {
@@ -644,10 +662,31 @@ app
         }
     }
 })
-.factory("coordinator", function($http){
+.factory("coordinator", function($http, API){
     return {
-        addStages: function(){
-            return;
+        addStages: function(courseId, stages, callback){
+            $http.post(API.url + "/coordinator/" + courseId + "/addStages", {
+                d: stages,
+            },{
+                withCredentials: true,
+            }).then(function successCallback(response){
+                if(callback) callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            })
+        },
+        addTasks: function(courseId, stage_no, tasks, callback){
+            $http.post(API.url + "/coordinator/" + courseId + "/" + stage_no.toString() + "/addTasks", {
+                d: tasks,
+            },{
+                withCredentials: true,
+            }).then(function successCallback(response){
+                if(callback) callback(response.data);
+            }, function errorCallback(response){
+                console.log("error");
+                if(callback) callback(response.data);
+            })
         },
     }
 })
